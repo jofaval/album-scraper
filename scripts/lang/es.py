@@ -26,6 +26,7 @@ STRINGS: Dict[str, str] = {
         'FOUND_TOTAL_IMAGES': 'Se ha(n) encontrado {{total_imgs}} imágen(es)',
         'IMAGES_DOWNLOADED': 'Ya se han descargado todas las imágenes del capítulo',
         'NOT_DOWNLOADED': 'No se ha(n) podido descargar {{not_downloaded}} imágen(es)',
+        'ANALYZING_IMAGES': 'Analizando las imágenes del capítulo {{chapter}}',
     },
     'THREADS': {
         'WAIT_ALL': 'Se espera a que terminen el resto de hilos',
