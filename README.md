@@ -82,7 +82,8 @@ since python will be installed by default pip3
 
 Those without pagination, and with all the links you want to scrape visible at the homepage
 
-![Pages example](./images/page-example.svg)
+![Pages example](./images/base.excalidraw.png)
+_Page layouts, Image designed with [excalidraw](https://excalidraw.com/)_
 
 ## Legal notice
 
