@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Logging
 - Base UI scaffolding, solidjs
 - Docs (readme and images), LICENSING and CHANGELOG
+- Github Actions ci/cd workflow pipeline
 
 ## 2022-11-25
 
