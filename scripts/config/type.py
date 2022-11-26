@@ -34,3 +34,6 @@ class ConfigType(TypedDict):
     """The image/files/names separator, usually a dot"""
     EVERYTHING: int
     """A constant to indicate the number to download up to infinity, and beyond ;)"""
+
+    BASE_DIR: str
+    """Base directory from which to store logs and chapters/imgs"""

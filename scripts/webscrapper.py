@@ -1,6 +1,6 @@
 # system
 from os import listdir
-from os.path import isfile, join as join_paths
+from os.path import isfile, join as join_paths, dirname, realpath
 import os
 import shutil
 # scraping
@@ -14,26 +14,29 @@ import cchardet  # only needs to be imported, not used
 from typing import List
 from bs4 import Tag
 
+# types
+from scripts.config.type import ConfigType
+from scripts.types import ScrapeProps
 # custom translator
 from scripts.lang import t
 # utils
 from scripts.utils import check_folder_or_create, cls
 # config
-from scripts.config.type import ConfigType
 from scripts.config.default import DEFAULT_CONFIG
 
 
 DEBUG = True
 
 
-def log(*args) -> None:
+def log(*args, display: bool = True) -> None:
     """Logs information if we're in debug mode"""
     # TODO: create a logging system, per module, on the physical drive
 
     if not DEBUG:
         return
 
-    log(*args)
+    if display:
+        print(*args)
 
 
 # |---------------------------|
@@ -42,6 +45,7 @@ def log(*args) -> None:
 
 CONF: ConfigType = {
     **DEFAULT_CONFIG,
+    'BASE_DIR': dirname(realpath(__file__))
 }
 
 
@@ -67,6 +71,7 @@ def get_chapters(start_at: int = 1):
     soup = parse_html(content)
 
     chapter_a_tags = soup.select(CONF['CHAPTERS_QUERY'])
+    # reverse the order, first becomes last, and so on and so forth
     chapter_a_tags = chapter_a_tags[::-1]
     chapter_links = [a['href'] for a in chapter_a_tags[(start_at - 1):]]
 
@@ -103,7 +108,7 @@ def download_img(dir: str, img_details: List[str, str]):
 
     img_content = requests.get(url, stream=True)
     img_content.raw.decode_content = True
-    with open(join_paths(dir, filename), "wb") as img_file:
+    with open(join_paths(CONF['BASE_DIR'], dir, filename), "wb") as img_file:
         shutil.copyfileobj(img_content.raw, img_file)
 
     log(t('IMAGES.IMAGE_SUCCESS', {'filename': filename}))
@@ -265,19 +270,13 @@ def detect_missing_imgs(stacktrace: bool = True):
     return incomplete_chapters
 
 
-def scrape(
-    start_at: int = 1,
-    limit_chapters: int = CONF['EVERYTHING'],
-    imgs_per_chapter: int = CONF['EVERYTHING'],
-    chapter_links: List[str] = None,
-    detect_corrupt: bool = True
-) -> None:
+def scrape(props: ScrapeProps) -> None:
     cls()
 
     if chapter_links is None:
-        chapter_links = get_chapters(start_at)[:limit_chapters]
-    if limit_chapters != CONF['EVERYTHING']:
-        chapter_links = chapter_links[:limit_chapters]
+        chapter_links = get_chapters(props.start_at)[:props.limit_chapters]
+    if props.limit_chapters != CONF['EVERYTHING']:
+        chapter_links = chapter_links[:props.limit_chapters]
 
     check_folder_or_create(CONF['CHAPTERS_FOLDER'])
 
@@ -286,11 +285,11 @@ def scrape(
     }))
 
     for chapter_link in chapter_links:
-        get_chapter(chapter_link, limit=imgs_per_chapter)
+        get_chapter(chapter_link, limit=props.imgs_per_chapter)
 
     wait_all_threads()
 
-    if detect_corrupt:
+    if props.detect_corrupt:
         incomplete_chapters = detect_missing_imgs()
         log(t('CHAPTERS.TOTAL_CORRUPTED_CHAPTERS', {
             'incomplete_chapters': len(incomplete_chapters),
@@ -336,3 +335,22 @@ def download_updates():
     scrape(chapter_links=updates, detect_corrupt=False)
 
     log(t('UPDATES.NEWS_DOWNLOADED'))
+
+
+def set_configuration(configuration: ConfigType) -> None:
+    """
+    Sets the configuration values to use
+
+    configuration : ConfigType
+        The dictionary object of key, values
+
+    returns None
+    """
+    for key, value in configuration.items():
+        CONF[key] = value
+
+
+def start(conf: ConfigType, props: ScrapeProps) -> None:
+    """Starts all the processes"""
+    set_configuration(conf)
+    scrape(props)

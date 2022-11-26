@@ -1,4 +1,5 @@
 from scripts.config.type import ConfigType
+from scripts.types import EVERYTHING
 
 
 DEFAULT_CONFIG: ConfigType = {
@@ -19,5 +20,5 @@ DEFAULT_CONFIG: ConfigType = {
     'LIMIT_THREADS': 10,
 
     'SEPARATOR': '.',
-    'EVERYTHING': -1,
+    'EVERYTHING': EVERYTHING,
 }
