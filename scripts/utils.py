@@ -1,5 +1,6 @@
 from os import name as os_name, system as cmd, makedirs
 from os.path import exists
+from datetime import datetime
 
 
 def cls() -> None:
@@ -18,3 +19,15 @@ def check_folder_or_create(path: str) -> bool:
     """
     if not exists(path):
         makedirs(path)
+
+
+def get_now_as_str(format: str = '%Y-%m-%d_%H-%M-%S') -> str:
+    """
+    Creates a string from the current timestamp
+
+    format : str
+        The date format, `%Y-%m-%d_%H-%M-%S` by default
+
+    return str
+    """
+    return datetime.now().strftime(format)

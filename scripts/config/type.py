@@ -41,3 +41,5 @@ class ConfigType(TypedDict):
     """Base directory from which to store logs and chapters/imgs"""
     IMG_SRC_ATTRIBUTE: str
     """The attribute from which to retrieve the img's src, "src" by default"""
+    LOGS_FOLDER: str
+    """The folder in which to store the logs"""

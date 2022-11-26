@@ -1,3 +1,4 @@
+from scripts.types import END_OF_LINE
 from .es import STRINGS as esLangs
 from functools import reduce
 from typing import TypedDict, Dict
@@ -64,7 +65,8 @@ def translate(key: str, params: dict = {}, options: OptionsDict = DEFAULT_OPTION
     for key, value in params.items():
         raw_string = raw_string.replace('{{' + key + '}}', str(value))
 
-    return raw_string
+    # \n inside a translation string is the end of line
+    return raw_string.replace('\n', END_OF_LINE)
 
 
 def t(key: str, params: dict = {}, options: OptionsDict = DEFAULT_OPTIONS) -> str:

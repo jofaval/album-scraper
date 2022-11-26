@@ -23,4 +23,6 @@ DEFAULT_CONFIG: ConfigType = {
     'SEPARATOR': '.',
     'EVERYTHING': EVERYTHING,
     'IMG_SRC_ATTRIBUTE': 'src',
+
+    'LOGS_FOLDER': 'logs'
 }

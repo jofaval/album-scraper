@@ -1,4 +1,5 @@
 # system
+from datetime import datetime
 from os import listdir
 from os.path import isfile, join as join_paths, dirname, realpath
 import os
@@ -15,23 +16,41 @@ from typing import List
 from bs4 import Tag
 
 # local
+
 # types
 from .config.type import ConfigType
-from .types import EVERYTHING, ScrapeProps
+from .types import ENCODING, END_OF_LINE, EVERYTHING, ScrapeProps
 # custom translator
 from .lang import t
 # utils
-from .utils import check_folder_or_create, cls
+from .utils import check_folder_or_create, cls, get_now_as_str
 # config
 from .config.default import DEFAULT_CONFIG
 
 
 DEBUG = True
+# local constant
+NOW_AS_STR = None
 
 
-def log(*args, display: bool = True) -> None:
+def log(*args, display: bool = True, log_date_format: str = "%Y-%m-%d_%H-%M-%S") -> None:
     """Logs information if we're in debug mode"""
-    # TODO: create a logging system, per module, on the physical drive
+    global NOW_AS_STR
+
+    logs_path = join_paths(CONF['BASE_DIR'], CONF['LOGS_FOLDER'])
+    check_folder_or_create(logs_path)
+
+    if not NOW_AS_STR:
+        NOW_AS_STR = get_now_as_str(log_date_format)
+
+    with open(join_paths(logs_path, f'{NOW_AS_STR}.log.txt'), 'a+', encoding=ENCODING) as fw:
+        parsed_args = ";".join(args)
+        parsed_args = END_OF_LINE.join([
+            f'[{get_now_as_str(log_date_format)}] - {line}'
+            for line in parsed_args.split(END_OF_LINE)
+        ])
+
+        fw.write(parsed_args + END_OF_LINE)
 
     if not DEBUG:
         return
@@ -284,6 +303,8 @@ def detect_missing_imgs(stacktrace: bool = True):
 
 
 def scrape(props: ScrapeProps) -> None:
+    global NOW_AS_STR
+
     cls()
 
     usable_props: ScrapeProps = {**props}
@@ -310,8 +331,10 @@ def scrape(props: ScrapeProps) -> None:
         incomplete_chapters = detect_missing_imgs()
         log(t('CHAPTERS.TOTAL_CORRUPTED_CHAPTERS', {
             'total_incomplete_chapters': len(incomplete_chapters),
-            'incomplete_chapters': '\n'.join(incomplete_chapters)
+            'incomplete_chapters': END_OF_LINE.join(incomplete_chapters)
         }))
+
+    NOW_AS_STR = None
 
 
 def detect_updates(chapters: List[str] = None):
