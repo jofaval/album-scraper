@@ -42,11 +42,15 @@ CONF: ConfigType = {
     **DEFAULT_CONFIG,
     'BASE_DIR': dirname(realpath(__file__))
 }
+SHOULD_LOG = True
 
 
 def log(*args, display: bool = True, log_date_format: str = "%Y-%m-%d_%H-%M-%S") -> None:
     """Logs information if we're in debug mode"""
     global NOW_AS_STR
+
+    if not SHOULD_LOG:
+        return
 
     logs_path = join_paths(CONF['BASE_DIR'], CONF['LOGS_FOLDER'])
     check_folder_or_create(logs_path)
@@ -269,6 +273,7 @@ def detect_missing_imgs(stacktrace: bool = True):
         new_imgs = []
         for img in imgs:
             if '-' not in img:
+                new_imgs.append(img)
                 continue
 
             # edge case, there might be some sort of dash to filter from
