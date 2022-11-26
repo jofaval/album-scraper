@@ -1,6 +1,8 @@
 # Album scraper
 
-Modularized python script for webscraping images
+Modularized python script for webscraping images.
+
+You can watch the changelog at [CHANGELOG](./CHANGELOG.md), it's an overall view, not greatly detailed.
 
 ## Contents
 
