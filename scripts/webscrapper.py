@@ -15,7 +15,7 @@ from typing import List
 from bs4 import Tag
 
 # custom translator
-from scripts.lang.index import t
+from scripts.lang import t
 # utils
 from scripts.utils import check_folder_or_create, cls
 # config
