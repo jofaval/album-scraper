@@ -16,7 +16,17 @@ Modularized python script for webscraping of images
 
 [Back to the contents](#contents)
 
-Scrape the images from a website into an album formatting (file wise)
+Scrape the images from a website into an album formatting (file wise).
+
+It's not perfect, it's straight to the point.
+
+## Motivation
+
+[Back to the contents](#contents)
+
+It's really annoying to keep downloading and organizing images you're downloading, for whatever that reason may be, and doing it all that work manually, too much mental overheat, what if you missed one image? how do you check it? they're unorganized by name, will you manually rename them? how many will you miss while doing so? and many more...
+
+Why act like a robot when a robot can do it for you?
 
 ## History
 
