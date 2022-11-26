@@ -49,3 +49,9 @@ since python will be installed by default pip3
 Those without pagination, and with all the links you want to scrape visible at the homepage
 
 ![Pages example](./images/page-example.svg)
+
+## Legal notice
+
+I am not endorsing any illegal activities, images still hold their licensing and ownership but it's rightful author(s). If the robots.txt do not allow the officially legal webscraping of the website, any infrightful, mischiveous or illegal act will still be illegal, and not my reponsability.
+
+Use this scripts at your own responsability.
