@@ -1,6 +1,6 @@
 # Album scraper
 
-Modularized python script for webscraping of images
+Modularized python script for webscraping images
 
 ## Contents
 
