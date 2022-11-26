@@ -1,8 +1,9 @@
-from scripts.config.type import ConfigType
-from scripts.types import EVERYTHING
+from ..config.type import ConfigType
+from ..types import EVERYTHING
 
 
 DEFAULT_CONFIG: ConfigType = {
+    'DOMAIN': 'https://example.com/',
     'BASE_URL': 'https://example.com/',
     'PARSER': 'html.parser',
     'URL_SEPARATOR': '/',
@@ -21,4 +22,5 @@ DEFAULT_CONFIG: ConfigType = {
 
     'SEPARATOR': '.',
     'EVERYTHING': EVERYTHING,
+    'IMG_SRC_ATTRIBUTE': 'src',
 }

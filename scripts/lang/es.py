@@ -8,13 +8,14 @@ STRINGS: Dict[str, str] = {
         'IMAGE_DIDNT_DOWNLOAD': 'No se ha podido descargar la imágen {{img}}',
         'PARSE_ERROR': 'Error de parseo',
         'CORRPUT_IMAGE_FOUND': 'Imágen corrupta o faltante encontrada {{chapter}} {{index}}{{extension}} {{filesize}})',
+        'INVALID_CHAPTER_URL': 'La URL del capítulo "{{chapter_url}}" no se ha detectado como válida, asegurese de que empieza por http[s]://',
     },
     'CHAPTERS': {
         'GET_ALL': 'Se intentan recuperar todos los capítulos, empezando a partir del: {{start_at}}',
         'CHAPTER_DOWNLOAD_STARTS': 'Se va a descargar el contenido del capítulo {{chapter_url}}',
         # 'TOTAL_CHAPTERS_RETRIEVED': 'Se han recuperado un total de {{total_chapter_links}} enalces'
         'TOTAL_CHAPTERS_RETRIEVED': 'Se ha(n) recuperado un total de {{chapter_links}} capítulo(s)',
-        'TOTAL_CORRUPTED_CHAPTERS': 'Capítulos incompletos o corruptos {{incomplete_chapters}} capítulo(s)\n {{incomplete_chapters}}',
+        'TOTAL_CORRUPTED_CHAPTERS': 'Capítulos incompletos o corruptos {{total_incomplete_chapters}} capítulo(s)\n {{incomplete_chapters}}',
         'CORRUPT_CHAPTERS_DETECTION':
         "|----------------------------------|\n"
             + "| Detección de capítulos corruptos |\n"

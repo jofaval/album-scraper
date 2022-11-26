@@ -1,9 +1,11 @@
+from dataclasses import dataclass
 from typing import List, TypedDict
 
 EVERYTHING = -1
 """Numeric representation of everything"""
 
 
+@dataclass
 class ScrapeProps(TypedDict):
     start_at: int
     """The (human) index it will start looking for at, starts at 1"""

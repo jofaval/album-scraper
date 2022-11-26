@@ -1,4 +1,4 @@
-from es import STRINGS as esLangs
+from .es import STRINGS as esLangs
 from functools import reduce
 from typing import TypedDict, Dict
 
@@ -61,8 +61,8 @@ def translate(key: str, params: dict = {}, options: OptionsDict = DEFAULT_OPTION
 
     # apply params
     raw_string = real_key
-    for key, value in params:
-        raw_string = raw_string.replace('{{' + key + '}}', value)
+    for key, value in params.items():
+        raw_string = raw_string.replace('{{' + key + '}}', str(value))
 
     return raw_string
 

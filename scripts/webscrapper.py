@@ -14,15 +14,16 @@ import cchardet  # only needs to be imported, not used
 from typing import List
 from bs4 import Tag
 
+# local
 # types
-from scripts.config.type import ConfigType
-from scripts.types import ScrapeProps
+from .config.type import ConfigType
+from .types import EVERYTHING, ScrapeProps
 # custom translator
-from scripts.lang import t
+from .lang import t
 # utils
-from scripts.utils import check_folder_or_create, cls
+from .utils import check_folder_or_create, cls
 # config
-from scripts.config.default import DEFAULT_CONFIG
+from .config.default import DEFAULT_CONFIG
 
 
 DEBUG = True
@@ -79,7 +80,7 @@ def get_chapters(start_at: int = 1):
 
 
 def parse_img(img: Tag):
-    return img.get('src')
+    return img.get(CONF['IMG_SRC_ATTRIBUTE'])
 
 
 def parse_chapter_title(title: str):
@@ -98,7 +99,7 @@ def get_image_filename(url: str):
     return url[start_at:]
 
 
-def download_img(dir: str, img_details: List[str, str]):
+def download_img(dir: str, img_details: List[str]):
     [url, filename] = img_details
     filename = get_image_filename(filename)
 
@@ -195,20 +196,32 @@ def rename_imgs(imgs: List[str]) -> List[str]:
 
 
 def get_chapter(chapter_url: str, show_progress: bool = True, limit: int = CONF['EVERYTHING']):
-    if not validators.url(chapter_url):
+    parsed_chapter_url = chapter_url
+
+    # attempts to add the domain, if not already provided
+    if not validators.url(parsed_chapter_url):
+        if CONF['DOMAIN'].endswith(CONF['URL_SEPARATOR']):
+            parsed_chapter_url = CONF['DOMAIN'] + parsed_chapter_url
+        else:
+            parsed_chapter_url = f'{CONF["DOMAIN"]}{CONF["URL_SEPARATOR"]}{parsed_chapter_url}'
+
+    if not validators.url(parsed_chapter_url):
+        log(t('ERRORS.INVALID_CHAPTER_URL', {
+            'chapter_url': parsed_chapter_url}))
         return None
 
-    log(t('CHAPTERS.CHAPTER_DOWNLOAD_STARTS', {'chapter_url': chapter_url}))
+    log(t('CHAPTERS.CHAPTER_DOWNLOAD_STARTS',
+        {'chapter_url': parsed_chapter_url}))
 
     title = parse_chapter_title(chapter_url)
 
-    content = get(chapter_url)
+    content = get(parsed_chapter_url)
     soup = parse_html(content)
     img_tags = soup.select(CONF['CHAPTER_IMG_QUERY'])
     if limit != CONF['EVERYTHING']:
         img_tags = img_tags[:limit]
 
-    check_folder_or_create(title)
+    check_folder_or_create(join_paths(CONF['BASE_DIR'], title))
 
     parsed_imgs = [parse_img(img) for img in img_tags]
     renamed_imgs = rename_imgs(parsed_imgs)
@@ -273,26 +286,30 @@ def detect_missing_imgs(stacktrace: bool = True):
 def scrape(props: ScrapeProps) -> None:
     cls()
 
-    if chapter_links is None:
-        chapter_links = get_chapters(props.start_at)[:props.limit_chapters]
-    if props.limit_chapters != CONF['EVERYTHING']:
-        chapter_links = chapter_links[:props.limit_chapters]
+    usable_props: ScrapeProps = {**props}
 
-    check_folder_or_create(CONF['CHAPTERS_FOLDER'])
+    if usable_props['chapter_links'] is None:
+        usable_props['chapter_links'] = get_chapters(usable_props['start_at'])
+    if usable_props['limit_chapters'] != CONF['EVERYTHING']:
+        usable_props['chapter_links'] = usable_props['chapter_links'][:usable_props['limit_chapters']]
+
+    check_folder_or_create(
+        join_paths(CONF['BASE_DIR'], CONF['CHAPTERS_FOLDER'])
+    )
 
     log(t('CHAPTERS.TOTAL_CHAPTERS_RETRIEVED', {
-        'chapter_links': len(chapter_links)
+        'chapter_links': len(usable_props['chapter_links'])
     }))
 
-    for chapter_link in chapter_links:
-        get_chapter(chapter_link, limit=props.imgs_per_chapter)
+    for chapter_link in usable_props['chapter_links']:
+        get_chapter(chapter_link, limit=usable_props['imgs_per_chapter'])
 
     wait_all_threads()
 
-    if props.detect_corrupt:
+    if usable_props['detect_corrupt']:
         incomplete_chapters = detect_missing_imgs()
         log(t('CHAPTERS.TOTAL_CORRUPTED_CHAPTERS', {
-            'incomplete_chapters': len(incomplete_chapters),
+            'total_incomplete_chapters': len(incomplete_chapters),
             'incomplete_chapters': '\n'.join(incomplete_chapters)
         }))
 
@@ -329,7 +346,6 @@ def download_updates():
     log(t('UPDATES.CHOSEN_OPTION', {'option': option}))
 
     if not option.lower() == 's':
-
         return log(t('UPDATES.NOT_DOWNLOADING_NEWS'))
 
     scrape(chapter_links=updates, detect_corrupt=False)
@@ -353,4 +369,16 @@ def set_configuration(configuration: ConfigType) -> None:
 def start(conf: ConfigType, props: ScrapeProps) -> None:
     """Starts all the processes"""
     set_configuration(conf)
-    scrape(props)
+
+    default_scrape_props: ScrapeProps = {
+        'chapter_links': None,
+        'detect_corrupt': True,
+        'imgs_per_chapter': EVERYTHING,
+        'limit_chapters': EVERYTHING,
+        'start_at': 1,
+    }
+
+    scrape({
+        **default_scrape_props,
+        **props,
+    })

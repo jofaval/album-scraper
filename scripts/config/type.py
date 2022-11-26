@@ -3,6 +3,8 @@ from typing import List, TypedDict
 
 
 class ConfigType(TypedDict):
+    DOMAIN: str
+    """Domain of the target page to scrape"""
     BASE_URL: str
     """Base url from where to start scraping"""
     PARSER: str
@@ -37,3 +39,5 @@ class ConfigType(TypedDict):
 
     BASE_DIR: str
     """Base directory from which to store logs and chapters/imgs"""
+    IMG_SRC_ATTRIBUTE: str
+    """The attribute from which to retrieve the img's src, "src" by default"""
