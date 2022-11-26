@@ -1,4 +1,4 @@
-from scripts.types import END_OF_LINE
+from scripts.constants import END_OF_LINE
 from .es import STRINGS as esLangs
 from functools import reduce
 from typing import TypedDict, Dict

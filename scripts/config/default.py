@@ -1,5 +1,7 @@
+# types
 from ..config.type import ConfigType
-from ..types import EVERYTHING
+# constants
+from ..constants import EVERYTHING
 
 
 DEFAULT_CONFIG: ConfigType = {
@@ -14,6 +16,7 @@ DEFAULT_CONFIG: ConfigType = {
 
     'EXTRA_TITLE_CONTENT': '/images/',
     'FILE_EXTENSION': '.jpg',
+    'LOG_EXTENSION': '.log.txt',
 
     'SHOULD_RENAME_IMAGES': True,
 

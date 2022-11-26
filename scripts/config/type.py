@@ -23,6 +23,8 @@ class ConfigType(TypedDict):
     """Is there any subfolder element to get the img? ex: domain.com/images/image-1.jpg"""
     FILE_EXTENSION: str
     """Usually .jpg"""
+    LOG_EXTENSION: str
+    """The log's file extension, `.log.txt` by default"""
 
     SHOULD_RENAME_IMAGES: bool
     """It's so that the downloded images are numeric and not the usual hash id (by usual, I mean somewhat common)"""

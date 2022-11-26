@@ -17,9 +17,11 @@ from bs4 import Tag
 
 # local
 
+# constants
+from .constants import ENCODING, END_OF_LINE, EVERYTHING
 # types
 from .config.type import ConfigType
-from .types import ENCODING, END_OF_LINE, EVERYTHING, ScrapeProps
+from .types import ScrapeProps
 # custom translator
 from .lang import t
 # utils
@@ -28,9 +30,18 @@ from .utils import check_folder_or_create, cls, get_now_as_str
 from .config.default import DEFAULT_CONFIG
 
 
+# |---------------------------|
+# |         CONSTANTS         |
+# |---------------------------|
+
 DEBUG = True
 # local constant
 NOW_AS_STR = None
+
+CONF: ConfigType = {
+    **DEFAULT_CONFIG,
+    'BASE_DIR': dirname(realpath(__file__))
+}
 
 
 def log(*args, display: bool = True, log_date_format: str = "%Y-%m-%d_%H-%M-%S") -> None:
@@ -43,7 +54,7 @@ def log(*args, display: bool = True, log_date_format: str = "%Y-%m-%d_%H-%M-%S")
     if not NOW_AS_STR:
         NOW_AS_STR = get_now_as_str(log_date_format)
 
-    with open(join_paths(logs_path, f'{NOW_AS_STR}.log.txt'), 'a+', encoding=ENCODING) as fw:
+    with open(join_paths(logs_path, f'{NOW_AS_STR}{CONF["LOG_EXTENSION"]}'), 'a+', encoding=ENCODING) as fw:
         parsed_args = ";".join(args)
         parsed_args = END_OF_LINE.join([
             f'[{get_now_as_str(log_date_format)}] - {line}'
@@ -57,16 +68,6 @@ def log(*args, display: bool = True, log_date_format: str = "%Y-%m-%d_%H-%M-%S")
 
     if display:
         print(*args)
-
-
-# |---------------------------|
-# |         CONSTANTS         |
-# |---------------------------|
-
-CONF: ConfigType = {
-    **DEFAULT_CONFIG,
-    'BASE_DIR': dirname(realpath(__file__))
-}
 
 
 def get(url: str):
@@ -107,7 +108,7 @@ def parse_chapter_title(title: str):
     title = title.replace(CONF['EXTRA_TITLE_CONTENT'], '')
     title = title.replace(CONF['URL_SEPARATOR'], '')
 
-    return join_paths(CONF['CHAPTERS_FOLDER'], title)
+    return join_paths(CONF['BASE_DIR'], CONF['CHAPTERS_FOLDER'], title)
 
 
 def get_image_filename(url: str):
@@ -254,13 +255,14 @@ def detect_missing_imgs(stacktrace: bool = True):
     log(t('CHAPTERS.CORRUPT_CHAPTERS_DETECTION'))
     incomplete_chapters = []
 
-    dir_elements = listdir(CONF['CHAPTERS_FOLDER'])
+    chapters_path = join_paths(CONF['BASE_DIR'], CONF['CHAPTERS_FOLDER'])
+    dir_elements = listdir(chapters_path)
     chapters = [elem for elem in dir_elements if not isfile(elem)]
 
     for chapter in chapters:
         log(t('IMAGES.ANALYZING_IMAGES', {'chapter': chapter}))
 
-        chapter_path = join_paths(CONF['CHAPTERS_FOLDER'], chapter)
+        chapter_path = join_paths(chapters_path, chapter)
         chapter_elements = listdir(chapter_path)
         imgs = [img.split(CONF['SEPARATOR'])[0] for img in chapter_elements]
 
@@ -338,7 +340,9 @@ def scrape(props: ScrapeProps) -> None:
 
 
 def detect_updates(chapters: List[str] = None):
-    downloaded_chapters = listdir(CONF['CHAPTERS_FOLDER'])
+    downloaded_chapters = listdir(join_paths(
+        CONF['BASE_DIR'], CONF['CHAPTERS_FOLDER']
+    ))
 
     if chapters is None:
         chapters = get_chapters()
