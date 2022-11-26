@@ -9,6 +9,7 @@ import requests
 import validators
 # performance
 import threading
+import cchardet  # only needs to be imported, not used
 # types
 from typing import List
 from bs4 import Tag

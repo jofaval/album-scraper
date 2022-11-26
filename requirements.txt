@@ -1,0 +1,4 @@
+bs4==0.0.1
+chardet==3.0.4
+validators==0.18.2
+lxml==4.6.3
