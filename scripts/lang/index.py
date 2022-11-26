@@ -1,7 +1,6 @@
 from es import STRINGS as esLangs
 from functools import reduce
 from typing import TypedDict, Dict
-from constants import DEFAULT_SEPARATOR, DEFAULT_OPTIONS, CURRENT_LANG
 
 
 LANGS: Dict[str, str] = {
@@ -54,7 +53,11 @@ def translate(key: str, params: dict = {}, options: OptionsDict = DEFAULT_OPTION
     """
     current_strings = LANGS[CURRENT_LANG]
 
-    real_key = get_translation_key(key, current_strings, options['separator'])
+    real_key = get_translation_key(
+        key=key.upper(),
+        strings=current_strings,
+        separator=options['separator']
+    )
 
     # apply params
     raw_string = real_key
@@ -62,3 +65,17 @@ def translate(key: str, params: dict = {}, options: OptionsDict = DEFAULT_OPTION
         raw_string = raw_string.replace('{{' + key + '}}', value)
 
     return raw_string
+
+
+def t(key: str, params: dict = {}, options: OptionsDict = DEFAULT_OPTIONS) -> str:
+    """
+    Translates a string, with params
+
+    key : str
+        The key of the string to translate
+    params : dict = {}
+        The params or variables of the string to translate, direct match
+
+    return str
+    """
+    return translate(key, params, options)
