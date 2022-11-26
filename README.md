@@ -5,6 +5,7 @@ Modularized python script for webscraping images
 ## Contents
 
 1. [Description](#description)
+1. [Motivation](#motivation)
 1. [History](#history)
 1. [How does it work?](#how-does-it-work)
    1. [Requirements](#requirements)
