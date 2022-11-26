@@ -17,6 +17,9 @@ from bs4 import Tag
 from scripts.lang.index import t
 # utils
 from scripts.utils import check_folder_or_create, cls
+# config
+from scripts.config.type import ConfigType
+from scripts.config.default import DEFAULT_CONFIG
 
 
 DEBUG = True
@@ -36,24 +39,9 @@ def log(*args) -> None:
 # |         CONSTANTS         |
 # |---------------------------|
 
-BASE_URL = ''
-PARSER = ''
-URL_SEPARATOR = ''
-
-CHAPTER_IMG_QUERY = ''
-CHAPTERS_FOLDER = ''
-CHAPTERS_QUERY = ''
-
-EXTRA_TITLE_CONTENT = ''
-FILE_EXTENSION = ''
-
-SHOULD_RENAME_IMAGES = None
-
-THREADS = None
-LIMIT_THREADS = 0
-
-SEPARATOR = ''
-EVERYTHING = -1
+CONF: ConfigType = {
+    **DEFAULT_CONFIG,
+}
 
 
 def get(url: str):
@@ -69,15 +57,15 @@ def get(url: str):
 
 
 def parse_html(raw_html: str):
-    return BeautifulSoup(raw_html, features=PARSER)
+    return BeautifulSoup(raw_html, features=CONF['PARSER'])
 
 
 def get_chapters(start_at: int = 1):
     log(t('CHAPTERS.GET_ALL', {'start_at': start_at}))
-    content = get(BASE_URL)
+    content = get(CONF['BASE_URL'])
     soup = parse_html(content)
 
-    chapter_a_tags = soup.select(CHAPTERS_QUERY)
+    chapter_a_tags = soup.select(CONF['CHAPTERS_QUERY'])
     chapter_a_tags = chapter_a_tags[::-1]
     chapter_links = [a['href'] for a in chapter_a_tags[(start_at - 1):]]
 
@@ -89,18 +77,18 @@ def parse_img(img: Tag):
 
 
 def parse_chapter_title(title: str):
-    title = title.replace(BASE_URL, '')
-    title = title.replace(EXTRA_TITLE_CONTENT, '')
-    title = title.replace(URL_SEPARATOR, '')
+    title = title.replace(CONF['BASE_URL'], '')
+    title = title.replace(CONF['EXTRA_TITLE_CONTENT'], '')
+    title = title.replace(CONF['URL_SEPARATOR'], '')
 
-    return join_paths(CHAPTERS_FOLDER, title)
+    return join_paths(CONF['CHAPTERS_FOLDER'], title)
 
 
 def get_image_filename(url: str):
-    if URL_SEPARATOR not in url:
+    if CONF['URL_SEPARATOR'] not in url:
         return url
 
-    start_at = url.rfind(URL_SEPARATOR) + 1
+    start_at = url.rfind(CONF['URL_SEPARATOR']) + 1
     return url[start_at:]
 
 
@@ -121,14 +109,14 @@ def download_img(dir: str, img_details: List[str, str]):
 
 
 def empty_threads():
-    while THREADS:
-        del THREADS[0]
+    while CONF['THREADS']:
+        del CONF['THREADS'][0]
 
 
 def wait_all_threads():
     log(t('THREADS.WAIT_ALL'))
 
-    for thread in THREADS:
+    for thread in CONF['THREADS']:
         thread.join()
 
     empty_threads()
@@ -137,9 +125,9 @@ def wait_all_threads():
 def threadify(target, args):
     img_download_thread = threading.Thread(target=target, args=args)
     img_download_thread.start()
-    THREADS.append(img_download_thread)
+    CONF['THREADS'].append(img_download_thread)
 
-    if (len(THREADS) >= LIMIT_THREADS):
+    if (len(CONF['THREADS']) >= CONF['LIMIT_THREADS']):
         wait_all_threads()
 
 
@@ -147,7 +135,7 @@ def download_imgs(show_progress: bool, title: str, imgs: List[str]):
     total_imgs = len(imgs)
     log(t('IMAGES.FOUND_TOTAL_IMAGES', {'total_imgs': total_imgs}))
 
-    THREADS = []
+    THREADS: List[threading.Thread] = []
 
     # TODO: add queues?
     not_downloaded = []
@@ -166,7 +154,7 @@ def download_imgs(show_progress: bool, title: str, imgs: List[str]):
                   'title': title,
                   'percentage': percentage,
                   'index': index,
-                  'url_separator': URL_SEPARATOR,
+                  'url_separator': CONF['URL_SEPARATOR'],
                   'total_imgs': total_imgs
                   })
         except:
@@ -191,13 +179,16 @@ def rename_imgs(imgs: List[str]) -> List[str]:
     devuelve las imágenes renombradas
     returns List[str]
     """
+    extension = CONF['FILE_EXTENSION']
+    should_rename = CONF['SHOULD_RENAME_IMAGES']
+
     return [
-        [img, f'{str(index + 1).zfill(3)}{FILE_EXTENSION}' if SHOULD_RENAME_IMAGES else img]
+        [img, f'{str(index + 1).zfill(3)}{extension}' if should_rename else img]
         for index, img in enumerate(imgs)
     ]
 
 
-def get_chapter(chapter_url: str, show_progress: bool = True, limit: int = EVERYTHING):
+def get_chapter(chapter_url: str, show_progress: bool = True, limit: int = CONF['EVERYTHING']):
     if not validators.url(chapter_url):
         return None
 
@@ -207,8 +198,8 @@ def get_chapter(chapter_url: str, show_progress: bool = True, limit: int = EVERY
 
     content = get(chapter_url)
     soup = parse_html(content)
-    img_tags = soup.select(CHAPTER_IMG_QUERY)
-    if limit != EVERYTHING:
+    img_tags = soup.select(CONF['CHAPTER_IMG_QUERY'])
+    if limit != CONF['EVERYTHING']:
         img_tags = img_tags[:limit]
 
     check_folder_or_create(title)
@@ -225,15 +216,15 @@ def detect_missing_imgs(stacktrace: bool = True):
     log(t('CHAPTERS.CORRUPT_CHAPTERS_DETECTION'))
     incomplete_chapters = []
 
-    dir_elements = listdir(CHAPTERS_FOLDER)
+    dir_elements = listdir(CONF['CHAPTERS_FOLDER'])
     chapters = [elem for elem in dir_elements if not isfile(elem)]
 
     for chapter in chapters:
         log(t('IMAGES.ANALYZING_IMAGES', {'chapter': chapter}))
 
-        chapter_path = join_paths(CHAPTERS_FOLDER, chapter)
+        chapter_path = join_paths(CONF['CHAPTERS_FOLDER'], chapter)
         chapter_elements = listdir(chapter_path)
-        imgs = [img.split(SEPARATOR)[0] for img in chapter_elements]
+        imgs = [img.split(CONF['SEPARATOR'])[0] for img in chapter_elements]
 
         new_imgs = []
         for img in imgs:
@@ -256,7 +247,7 @@ def detect_missing_imgs(stacktrace: bool = True):
         for index, img in enumerate(imgs):
             try:
                 filesize = os.path.getsize(
-                    join_paths(chapter_path, str(img) + FILE_EXTENSION))
+                    join_paths(chapter_path, str(img) + CONF['FILE_EXTENSION']))
             except:
                 filesize = 0
             if (not int(img) == (index + 1)) | (not filesize > 0):
@@ -264,7 +255,7 @@ def detect_missing_imgs(stacktrace: bool = True):
                     log(t('ERRORS.CORRPUT_IMAGE_FOUND', {
                         'chapter': chapter,
                         'index': (index + 1),
-                        'extension': FILE_EXTENSION,
+                        'extension': CONF['FILE_EXTENSION'],
                         'filesize': filesize,
                     }))
                 incomplete_chapters.append(chapter)
@@ -275,8 +266,8 @@ def detect_missing_imgs(stacktrace: bool = True):
 
 def scrape(
     start_at: int = 1,
-    limit_chapters: int = EVERYTHING,
-    imgs_per_chapter: int = EVERYTHING,
+    limit_chapters: int = CONF['EVERYTHING'],
+    imgs_per_chapter: int = CONF['EVERYTHING'],
     chapter_links: List[str] = None,
     detect_corrupt: bool = True
 ) -> None:
@@ -284,10 +275,10 @@ def scrape(
 
     if chapter_links is None:
         chapter_links = get_chapters(start_at)[:limit_chapters]
-    if limit_chapters != EVERYTHING:
+    if limit_chapters != CONF['EVERYTHING']:
         chapter_links = chapter_links[:limit_chapters]
 
-    check_folder_or_create(CHAPTERS_FOLDER)
+    check_folder_or_create(CONF['CHAPTERS_FOLDER'])
 
     log(t('CHAPTERS.TOTAL_CHAPTERS_RETRIEVED', {
         'chapter_links': len(chapter_links)
@@ -307,7 +298,7 @@ def scrape(
 
 
 def detect_updates(chapters: List[str] = None):
-    downloaded_chapters = listdir(CHAPTERS_FOLDER)
+    downloaded_chapters = listdir(CONF['CHAPTERS_FOLDER'])
 
     if chapters is None:
         chapters = get_chapters()

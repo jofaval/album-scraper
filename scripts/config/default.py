@@ -1,4 +1,7 @@
-DEFAULT_CONFIG = {
+from scripts.config.type import ConfigType
+
+
+DEFAULT_CONFIG: ConfigType = {
     'BASE_URL': 'https://example.com/',
     'PARSER': 'html.parser',
     'URL_SEPARATOR': '/',
