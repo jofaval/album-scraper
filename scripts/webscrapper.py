@@ -1,6 +1,6 @@
 # system
-from os import listdir, name as os_name, system as cmd, makedirs
-from os.path import isfile, join as join_paths, exists
+from os import listdir
+from os.path import isfile, join as join_paths
 import os
 import shutil
 # scraping
@@ -15,10 +15,8 @@ from bs4 import Tag
 
 # custom translator
 from scripts.lang.index import t
-
-
-def cls():
-    cmd('cls' if os_name == 'nt' else 'clear')
+# utils
+from scripts.utils import check_folder_or_create, cls
 
 
 DEBUG = True
@@ -213,8 +211,7 @@ def get_chapter(chapter_url: str, show_progress: bool = True, limit: int = EVERY
     if limit != EVERYTHING:
         img_tags = img_tags[:limit]
 
-    if not os.path.exists(title):
-        os.makedirs(title)
+    check_folder_or_create(title)
 
     parsed_imgs = [parse_img(img) for img in img_tags]
     renamed_imgs = rename_imgs(parsed_imgs)
@@ -290,8 +287,7 @@ def scrape(
     if limit_chapters != EVERYTHING:
         chapter_links = chapter_links[:limit_chapters]
 
-    if not os.path.exists(CHAPTERS_FOLDER):
-        os.makedirs(CHAPTERS_FOLDER)
+    check_folder_or_create(CHAPTERS_FOLDER)
 
     log(t('CHAPTERS.TOTAL_CHAPTERS_RETRIEVED', {
         'chapter_links': len(chapter_links)
