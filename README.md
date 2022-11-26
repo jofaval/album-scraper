@@ -1,20 +1,40 @@
 # Album scraper
 
+Modularized python script for webscraping of images
+
+## Contents
+
+1. [Description](#description)
+1. [History](#history)
+1. [How does it work?](#how-does-it-work)
+   1. [Requirements](#requirements)
+   1. [Installation](#installation)
+1. [What pages does it work on?](#what-pages-does-it-work-on)
+1. [Legal notice](#legal-notice)
+
 ## Description
+
+[Back to the contents](#contents)
 
 Scrape the images from a website into an album formatting (file wise)
 
 ## History
 
+[Back to the contents](#contents)
+
 Started more than a year ago and I applied little modifications here and there, iterating, and finally decided to try and encapsulate it for module usage
 
 ## How does it work?
+
+[Back to the contents](#contents)
 
 You'll have to execute the `scrape` method at the moment, but module integration is not finished yet.
 
 **_To be defined_**
 
 ### Requirements
+
+[Back to the contents](#contents)
 
 - Python 3.8.4 or higher
   - not tested on lower, but it should work on >= 3.6.x
@@ -33,6 +53,8 @@ Or manually install the following:
 
 ### Installation
 
+[Back to the contents](#contents)
+
 ```bash
 python -m pip install
 # or pip3 install if you're on linux/unix systems
@@ -46,11 +68,15 @@ since python will be installed by default pip3
 
 ## What pages does it work on?
 
+[Back to the contents](#contents)
+
 Those without pagination, and with all the links you want to scrape visible at the homepage
 
 ![Pages example](./images/page-example.svg)
 
 ## Legal notice
+
+[Back to the contents](#contents)
 
 I am not endorsing any illegal activities, images still hold their licensing and ownership but it's rightful author(s). If the robots.txt do not allow the officially legal webscraping of the website, any infrightful, mischiveous or illegal act will still be illegal, and not my reponsability.
 
