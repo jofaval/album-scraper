@@ -377,7 +377,7 @@ def download_updates():
 
     log(t('UPDATES.CHOSEN_OPTION', {'option': option}))
 
-    if not option.lower() == 's':
+    if option.lower() not in ['s', 'y']:
         return log(t('UPDATES.NOT_DOWNLOADING_NEWS'))
 
     scrape(chapter_links=updates, detect_corrupt=False)

@@ -1,11 +1,13 @@
 from scripts.constants import END_OF_LINE
 from .es import STRINGS as esLangs
+from .en import STRINGS as enLangs
 from functools import reduce
 from typing import TypedDict, Dict
 
 
 LANGS: Dict[str, str] = {
-    'ES': esLangs
+    'ES': esLangs,
+    'EN': enLangs,
 }
 
 
