@@ -2,7 +2,7 @@
 from .es import STRINGS as esLangs
 from .en import STRINGS as enLangs
 # types
-from typing import Dict
+from typing import Dict, Union
 
 LANGS: Dict[str, Dict[str, str]] = {
     'ES': esLangs,
@@ -13,7 +13,7 @@ CURRENT_LANG = 'ES'
 STRINGS = LANGS[CURRENT_LANG]
 
 
-def t(key: str) -> str or None:
+def t(key: str) -> Union[str, None]:
     """
     Translate a string
 
