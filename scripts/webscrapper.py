@@ -313,6 +313,7 @@ def scrape(props: ScrapeProps) -> None:
     global NOW_AS_STR
 
     cls()
+    check_folder_or_create(CONF['BASE_DIR'])
 
     usable_props: ScrapeProps = {**props}
 
