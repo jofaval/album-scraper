@@ -1,7 +1,11 @@
+# constants
 from scripts.constants import END_OF_LINE
+# multilang
 from .es import STRINGS as esLangs
 from .en import STRINGS as enLangs
+# functions
 from functools import reduce
+# types
 from typing import TypedDict, Dict
 
 
