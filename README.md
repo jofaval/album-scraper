@@ -23,7 +23,7 @@ You can watch the changelog at [CHANGELOG](./CHANGELOG.md), it's an overall view
 
 Scrape the images from a website into an album formatting (file wise).
 
-It's not perfect, it's straight to the point.
+It's not perfect, it's straight to the point. It (somewhat) complies with Pylint, where useful
 
 ## Motivation
 
@@ -59,10 +59,7 @@ Libraries:
 
 Or manually install the following:
 
-- shutil
-- requests
-- validators
-- bs4
+Look at the [requirements.txt](./requirements.txt) file.
 
 ### Installation
 
