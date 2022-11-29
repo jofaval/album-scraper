@@ -1,3 +1,7 @@
+"""
+Image model
+"""
+
 # system
 from shutil import copyfileobj
 from os.path import join
@@ -23,24 +27,13 @@ class Image(BaseModel):
     chapter: Chapter
     url: str
     index: int
-    should_be_renamed: bool
+    should_be_renamed: bool = False
     logger: Logger
     requester: Requester
     extension: str
 
-    def __init__(self, url_separator, logger, chapter, url, index, requester, extension, should_be_renamed=False):
-        self.url_separator = url_separator
-        self.logger = logger
-        self.chapter = chapter
-        self.url = url
-        self.index = index
-        self.should_be_renamed = should_be_renamed
-        self.requester = requester
-        self.extension = extension
-        pass
-
     def scrape(self, retries: int = DEFAULT_IMG_DOWNLOAD_RETRIES) -> None:
-        """"""
+        """Scrape an image, wrapper for a download"""
         success = False
 
         if retries > SINGLE_RETRY:
@@ -51,10 +44,10 @@ class Image(BaseModel):
         return success
 
     def download(self) -> bool:
-        """"""
+        """Simple download functionality"""
         content = self.requester.get_img(self.url)
 
-        if content == False:
+        if content is False:
             self.logger.log(
                 t('ERRORS.INVALID_URL', {
                   'filename': self.get_filename(), 'url': self.url
@@ -64,10 +57,13 @@ class Image(BaseModel):
         return self.save(content)
 
     def download_with_retries(self, max_retries: int) -> bool:
-        """"""
+        """Downloads with a fallback"""
         for attempt in range(max_retries):
-            self.logger.log(
-                t('IMAGES.IMAGE_ATTEMPT', {'attempt': attempt + 1, 'max_retries': max_retries, 'url': self.url}))
+            self.logger.log(t('IMAGES.IMAGE_ATTEMPT', {
+                'attempt': attempt + 1,
+                'max_retries': max_retries,
+                'url': self.url,
+            }))
 
             success = self.download()
             if success:
@@ -76,11 +72,11 @@ class Image(BaseModel):
         return False
 
     def get_filename(self, should_rename: bool = True) -> str:
-        """"""
-        if self.url_separator not in self.url:
+        """Gets the image's name"""
+        if self.chapter.url_separator not in self.url:
             return self.url
 
-        start_at = self.url.rfind(self.url_separator) + 1
+        start_at = self.url.rfind(self.chapter.url_separator) + 1
         filename = self.url[start_at:]
 
         if not should_rename:
@@ -89,7 +85,7 @@ class Image(BaseModel):
         return f'{pad(self.index + 1)}{self.extension}'
 
     def save(self, content: Any) -> bool:
-        """"""
+        """Saves the image physically"""
         try:
             with open(join(self.chapter.get_folder_name(), self.get_filename()), "wb") as img_file:
                 copyfileobj(content.raw, img_file)
@@ -97,11 +93,8 @@ class Image(BaseModel):
             self.logger.log(t('IMAGES.IMAGE_SUCCESS', {
                             'filename': self.get_filename()}))
             return True
-        except:
+        except Exception as ex:
             return False
 
     def is_healthy(self) -> bool:
-        """"""
-        pass
-
-    pass
+        """Checks the image's health"""

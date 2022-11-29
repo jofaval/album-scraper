@@ -1,12 +1,17 @@
+"""
+Main logic for the multilang custom utility,
+Also serves as the umbrella for all lang-related content
+"""
+
+# functions
+from functools import reduce
+# types
+from typing import TypedDict, Dict
 # constants
 from scripts.constants import END_OF_LINE
 # multilang
 from .es import STRINGS as esLangs
 from .en import STRINGS as enLangs
-# functions
-from functools import reduce
-# types
-from typing import TypedDict, Dict
 
 
 LANGS: Dict[str, str] = {
@@ -16,6 +21,7 @@ LANGS: Dict[str, str] = {
 
 
 class OptionsDict(TypedDict):
+    """The option props for the translator"""
     separator: str
     """The key separator for the translation strings"""
 
@@ -47,7 +53,7 @@ def get_translation_key(key: str, strings: dict, separator: str = DEFAULT_SEPARA
     return reduce(lambda strings_dict, k: strings_dict[k], key.split(separator), strings)
 
 
-def translate(key: str, params: dict = {}, options: OptionsDict = DEFAULT_OPTIONS) -> str:
+def translate(key: str, params: dict = None, options: OptionsDict = DEFAULT_OPTIONS) -> str:
     """
     Translates a string, with params
 
@@ -75,7 +81,7 @@ def translate(key: str, params: dict = {}, options: OptionsDict = DEFAULT_OPTION
     return raw_string.replace('\n', END_OF_LINE)
 
 
-def t(key: str, params: dict = {}, options: OptionsDict = DEFAULT_OPTIONS) -> str:
+def t(key: str, params: dict = None, options: OptionsDict = DEFAULT_OPTIONS) -> str:
     """
     Translates a string, with params
 

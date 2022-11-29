@@ -1,3 +1,7 @@
+"""
+Example module config
+"""
+
 # system
 from os.path import dirname, realpath
 # types

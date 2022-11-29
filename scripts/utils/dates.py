@@ -1,14 +1,18 @@
+"""
+Date utilities
+"""
+
 # dates
 from datetime import datetime
 
 
-def get_now_as_str(format: str = '%Y-%m-%d_%H-%M-%S') -> str:
+def get_now_as_str(date_format: str = '%Y-%m-%d_%H-%M-%S') -> str:
     """
     Creates a string from the current timestamp
 
-    format : str
+    date_format : str
         The date format, `%Y-%m-%d_%H-%M-%S` by default
 
     return str
     """
-    return datetime.now().strftime(format)
+    return datetime.now().strftime(date_format)

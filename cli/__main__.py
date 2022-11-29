@@ -1,3 +1,8 @@
+"""
+Main CLI execution entrypoint,
+calling this file will provide the CLI experience
+"""
+
 from argparse import ArgumentParser
 
 from .create_module import init_args as create_module_args

@@ -1,3 +1,7 @@
+"""
+Types for the album model
+"""
+
 # types
 from dataclasses import dataclass
 from typing import List, TypedDict
@@ -6,24 +10,26 @@ from .image import Image
 
 
 class ChapterScraperThread(TypedDict):
+    """Props for the chapter scraping thread"""
+
     chapter: Chapter
     imgs_per_chapter: int
 
-    pass
-
 
 class ImageDownloadThread(TypedDict):
+    """Props for the image download thread"""
+
     show_progress: bool
     image: Image
     index: int
     total_imgs: int
     not_downloaded: List[str]
 
-    pass
-
 
 @dataclass
 class ScrapeProps(TypedDict):
+    """Scrape initialization props"""
+
     start_at: int
     """The (human) index it will start looking for at, starts at 1"""
 

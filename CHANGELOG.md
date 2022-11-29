@@ -4,6 +4,16 @@ The log of changes on the project/repository.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 2022-11-30
+
+### Added
+
+- Add the pylint extension and styleguide
+
+### Modified
+
+- Implemented some rules over the codebase to satisfy Pylint's warnings
+
 ## 2022-11-29
 
 ### Added

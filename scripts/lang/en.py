@@ -1,3 +1,7 @@
+"""
+English translations
+"""
+
 from typing import Dict
 
 

@@ -1,3 +1,7 @@
+"""
+Main logger functionality
+"""
+
 # system
 from os.path import join
 # types
@@ -17,25 +21,17 @@ class Logger(BaseModel):
     joiner: str = '§'
     """The joiner character"""
 
-    def __init__(
-        self,
-        base_dir: str,
-        folder_name: str = DEFAULT_FOLDER_NAME,
-        debug: bool = True,
-        extension: str = DEFAULT_EXTENSION,
-        log_date_format: str = DEFAULT_LOG_DATE_FORMAT,
-        should_log: bool = True,
-    ) -> None:
-        self.current = None
-        self.base_dir = base_dir
-        self.folder_name = folder_name
-        self.debug = debug
-        self.extension = extension
-        self.log_date_format = log_date_format
-        self.should_log = should_log
-        pass
+    base_dir: str
+    folder_name: str = DEFAULT_FOLDER_NAME
+    debug: bool = True
+    extension: str = DEFAULT_EXTENSION
+    log_date_format: str = DEFAULT_LOG_DATE_FORMAT
+    should_log: bool = True
+    current: str = None
+    logs_path: str = None
 
     def get_log_path(self) -> str:
+        """Get the logs path"""
         if self.logs_path:
             return self.logs_path
 
@@ -44,9 +40,11 @@ class Logger(BaseModel):
         return self.logs_path
 
     def get_filename(self) -> str:
+        """Get the logs filenama"""
         return join(self.get_log_path(), f'{self.current}{self.extension}')
 
     def parse_log_content(self, args) -> str:
+        """Parses the content to input in the log"""
         parsed_args = self.joiner.join(args)
         parsed_args = END_OF_LINE.join([
             f'[{get_now_as_str(self.log_date_format)}] - {line}'
@@ -56,8 +54,9 @@ class Logger(BaseModel):
         return parsed_args + END_OF_LINE
 
     def store(self, *args) -> None:
-        with open(self.get_filename(), WRITE_MODE, encoding=ENCODING) as fw:
-            fw.write(self.parse_log_content(args))
+        """Stores the content in a file"""
+        with open(self.get_filename(), WRITE_MODE, encoding=ENCODING) as file_writter:
+            file_writter.write(self.parse_log_content(args))
 
     def log(self, *args, display: bool = True) -> bool:
         """Logs information if we're in debug mode"""
@@ -72,12 +71,10 @@ class Logger(BaseModel):
         try:
             self.store(*args)
             success = True
-        except Exception as ex:
-            self.store(str(ex))
+        except IOError as error:
+            self.store(str(error))
 
         if self.debug and display:
             print(*args)
 
         return success
-
-    pass

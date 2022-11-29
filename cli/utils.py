@@ -1,3 +1,7 @@
+"""
+Some CLI utilities
+"""
+
 from argparse import ArgumentParser
 
 

@@ -1,3 +1,7 @@
+"""
+Example module scrape entrypoint
+"""
+
 # types
 from scripts.models.album_types import ScrapeProps
 # constants

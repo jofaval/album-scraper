@@ -1,8 +1,14 @@
+"""
+This module helps with translation,
+specifically the CLI's translations,
+a simplified version of the scripts
+"""
+
+# types
+from typing import Dict, Union
 # a simpler and "far nicer" version of a "translator"
 from .es import STRINGS as esLangs
 from .en import STRINGS as enLangs
-# types
-from typing import Dict, Union
 
 LANGS: Dict[str, Dict[str, str]] = {
     'ES': esLangs,

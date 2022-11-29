@@ -1,22 +1,26 @@
+"""
+@deprecrated
+Main entrypoint and workflow for the scraper
+"""
+
+# types
+from typing import List
 # system
 from os import listdir
 from os.path import isfile, join as join_paths, dirname, realpath, getsize
 import cchardet  # only needs to be imported, not used
-# types
-from typing import List
 
 
 # local
 
 # constants
-from .constants import END_OF_LINE, EVERYTHING
+from .constants import EVERYTHING
 # types
 from .config.type import ConfigType
 from .models.album_types import ScrapeProps
 # custom translator
 from .lang import t
 # utils
-from .utils import check_folder_or_create, cls
 from .logger import Logger
 # config
 from .config.default import DEFAULT_CONFIG

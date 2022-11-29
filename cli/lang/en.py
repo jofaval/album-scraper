@@ -1,3 +1,7 @@
+"""
+English CLI translations
+"""
+
 from typing import Dict
 
 STRINGS: Dict[str, str] = {

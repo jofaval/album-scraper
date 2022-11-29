@@ -1,12 +1,21 @@
+"""
+Album model
+
+Contains Chapters
+"""
+
 # system
 from os.path import join
-# constants
-from ..constants import END_OF_LINE, EVERYTHING
+# multiprocessing
+from multiprocessing import Pool, cpu_count
 # types
-from typing import Generator, List, TypedDict
+from typing import Generator, List
 from pydantic import BaseModel
 from ..logger import Logger
 from ..utils import Requester
+from .album_types import ChapterScraperThread, ImageDownloadThread
+# constants
+from ..constants import END_OF_LINE, EVERYTHING
 # custom
 from ..config.type import ConfigType
 # models
@@ -16,8 +25,6 @@ from .image import Image
 from ..lang import t
 # utils
 from ..utils.system import check_folder_or_create, cls
-# multiprocessing
-from multiprocessing import Pool, cpu_count
 
 
 class Album(BaseModel):
@@ -46,6 +53,7 @@ class Album(BaseModel):
         return chapter_links
 
     def prepare(self) -> None:
+        """Initializes the Album configuration"""
         cls()
 
         check_folder_or_create(self.configuration['BASE_DIR'])
@@ -57,13 +65,18 @@ class Album(BaseModel):
         # TODO: 21:22 29/11/2022 complete
         # self.logger = Logger()
         # self.requester = Requester()
-        pass
 
     def parse_chapter(self, url: str) -> Chapter:
+        """Creates a chapter instance from a given URL"""
         # TODO: implement parsing
-        pass
 
-    def get_chapter_links(self, chapter_links: List[str], start_at: int, is_reversed: bool, limit_chapters: int) -> List[str]:
+    def get_chapter_links(
+        self, chapter_links: List[str],
+        start_at: int,
+        is_reversed: bool,
+        limit_chapters: int,
+    ) -> List[str]:
+        """Discriminates the chapters links source"""
         if chapter_links is None:
             chapter_links = self.scrape_all_chapters(start_at, is_reversed)
         if limit_chapters != EVERYTHING:
@@ -72,6 +85,7 @@ class Album(BaseModel):
         return chapter_links
 
     def get_all_chapters_images(self) -> List[Image]:
+        """Gets all the images from all the chapters (locally)"""
         images = []
 
         for chapter in self.chapters:
@@ -87,7 +101,7 @@ class Album(BaseModel):
         limit_chapters: int = EVERYTHING,
         detect_corrupt: bool = True
     ) -> None:
-        """"""
+        """Main entrypoint of the album flow"""
         self.prepare()
 
         chapter_links = self.get_chapter_links(
@@ -112,22 +126,20 @@ class Album(BaseModel):
                 'total_incomplete_chapters': len(incomplete_chapters),
                 'incomplete_chapters': END_OF_LINE.join(incomplete_chapters)
             }))
-        pass
 
-    def check_health(self) -> None:
-        """"""
-        pass
+    def check_health(self) -> List[str]:
+        """Checks the health of a given album"""
+        return []
 
     def detect_updates(self) -> None:
-        """"""
-        pass
+        """Detects a desynchronization between the album and the downloads"""
 
-    def thread_scrape_chapter(props: ChapterScraperThread) -> None:
+    def thread_scrape_chapter(self, props: ChapterScraperThread) -> None:
+        """Thread logic for a chapter scrape"""
         props['chapter'].scrape(props['imgs_per_chapter'])
-        pass
 
     def scrape_chapters(self, imgs_per_chapter: int = EVERYTHING) -> None:
-        """"""
+        """Scrapes all the chapters"""
         if not self.chapters:
             return
 
@@ -137,10 +149,8 @@ class Album(BaseModel):
                 for chapter in self.chapters
             ])
 
-        pass
-
     def thread_download_image(self, props: ImageDownloadThread) -> None:
-        """"""
+        """Thread logic for an image download"""
         percentage = '{0:.2%}'.format(
             (props['index'] + 1) / props['total_imgs']
         )
@@ -164,7 +174,7 @@ class Album(BaseModel):
             })
 
     def parallelize_images_download(self, show_progress: bool, images: List[Image]) -> List[str]:
-        """"""
+        """Parallelizes the bulk download of images"""
         not_downloaded = []
 
         parallelization_args: Generator[ImageDownloadThread] = (
@@ -183,6 +193,7 @@ class Album(BaseModel):
         return not_downloaded
 
     def scrape_images(self, images: List[Image], show_progress: bool = True) -> None:
+        """Scrapes all of the chapter's images"""
         total_imgs = len(images)
         self.logger.log(t('IMAGES.FOUND_TOTAL_IMAGES', {
             'total_imgs': total_imgs
@@ -199,9 +210,3 @@ class Album(BaseModel):
             self.logger.log('IMAGES.NOT_DOWNLOADED', {
                 'not_downloaded': len(not_downloaded)
             })
-
-    def load_configuration(self) -> None:
-        """"""
-        pass
-
-    pass

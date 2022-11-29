@@ -1,3 +1,7 @@
+"""
+The module generation CLI utilities
+"""
+
 # vendor
 from argparse import ArgumentParser
 # multilang

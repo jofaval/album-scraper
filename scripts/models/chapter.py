@@ -1,18 +1,25 @@
+"""
+Chapter model
+
+Containers Images
+"""
+
 # system
 from os.path import join
-# constants
-from ..constants import EVERYTHING
 # types
 from typing import List, Union
 from pydantic import BaseModel
 from logger import Logger
-from ..utils import Requester
 from bs4 import Tag
-from ..models.album import Album
-# models
-from .image import Image
 # utils
 from validators import url as is_url
+# types
+from ..utils import Requester
+from ..models.album import Album
+# constants
+from ..constants import EVERYTHING
+# models
+from .image import Image
 from ..utils import check_folder_or_create, pad
 # translator
 from ..lang import t
@@ -39,6 +46,7 @@ class Chapter(BaseModel):
     album: Album
 
     def get_parsed_chapter_url(self) -> Union[str, None]:
+        """Gets the actual chapter URL"""
         parsed_url = self.url
 
         # attempts to add the domain, if not already provided
@@ -57,6 +65,7 @@ class Chapter(BaseModel):
         return parsed_url
 
     def parse_image(self, image: Tag, index: int) -> Image:
+        """Generates an Image instance"""
         parsed = self.requester.parse_img(image)
         transformed = Image(
             url_separator=self.url_separator,
@@ -71,7 +80,7 @@ class Chapter(BaseModel):
         return transformed
 
     def scrape(self, images_limit: int = EVERYTHING) -> None:
-        """"""
+        """Scrapes the chapter's details"""
         parsed_url = self.get_parsed_chapter_url()
         if not parsed_url:
             return
@@ -94,14 +103,15 @@ class Chapter(BaseModel):
         return self.images
 
     def get_images(self) -> List[Image]:
-        """"""
-        pass
+        """Gets all the chapter's images"""
+        return
 
     def check_health(self) -> Union[bool, List[str]]:
-        """"""
-        pass
+        """Checks the chapter's health"""
+        return True
 
     def get_title_name(self, should_rename: bool = False) -> str:
+        """Get the actual chapter's title"""
         if self.title:
             return self.title
 
@@ -115,10 +125,8 @@ class Chapter(BaseModel):
         return title
 
     def get_folder_name(self) -> str:
-        """"""
+        """Generate the folder name"""
         if self.folder_name:
             return self.folder_name
 
         return join(self.base_dir, self.chapters_folder_name, self.get_title_name())
-
-    pass
