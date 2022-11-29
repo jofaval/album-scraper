@@ -3,7 +3,8 @@ from typing import Dict
 
 STRINGS: Dict[str, str] = {
     'ERRORS': {
-        'GET_PAGE': 'Could not retrieve content for page {{url}}',
+        'GET_PAGE': 'Could not retrieve content for page: {{url}}',
+        'GET_IMG': 'Could not retrieve content for image: {{url}}',
         'INVALID_URL': 'Url for image "{{filename}}" not found or invalid, URL: {{url}}',
         'IMAGE_DIDNT_DOWNLOAD': 'Failed to download image {{img}}',
         'PARSE_ERROR': 'parse error',

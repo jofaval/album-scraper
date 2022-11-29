@@ -1,11 +1,8 @@
 # system
-from datetime import datetime
 from os import listdir
-from os.path import isfile, join as join_paths, dirname, realpath
-import os
+from os.path import isfile, join as join_paths, dirname, realpath, getsize
 import shutil
 # scraping
-from bs4 import BeautifulSoup
 import requests
 import validators
 # performance
@@ -13,19 +10,20 @@ import threading
 import cchardet  # only needs to be imported, not used
 # types
 from typing import List
-from bs4 import Tag
+
 
 # local
 
 # constants
-from .constants import ENCODING, END_OF_LINE, EVERYTHING
+from .constants import END_OF_LINE, EVERYTHING
 # types
 from .config.type import ConfigType
 from .types import ScrapeProps
 # custom translator
 from .lang import t
 # utils
-from .utils import check_folder_or_create, cls, get_now_as_str
+from .utils import check_folder_or_create, cls
+from .logger import Logger
 # config
 from .config.default import DEFAULT_CONFIG
 
@@ -35,8 +33,6 @@ from .config.default import DEFAULT_CONFIG
 # |---------------------------|
 
 DEBUG = True
-# local constant
-NOW_AS_STR = None
 
 CONF: ConfigType = {
     **DEFAULT_CONFIG,
@@ -44,34 +40,7 @@ CONF: ConfigType = {
 }
 SHOULD_LOG = True
 
-
-def log(*args, display: bool = True, log_date_format: str = "%Y-%m-%d_%H-%M-%S") -> None:
-    """Logs information if we're in debug mode"""
-    global NOW_AS_STR
-
-    if not SHOULD_LOG:
-        return
-
-    logs_path = join_paths(CONF['BASE_DIR'], CONF['LOGS_FOLDER'])
-    check_folder_or_create(logs_path)
-
-    if not NOW_AS_STR:
-        NOW_AS_STR = get_now_as_str(log_date_format)
-
-    with open(join_paths(logs_path, f'{NOW_AS_STR}{CONF["LOG_EXTENSION"]}'), 'a+', encoding=ENCODING) as fw:
-        parsed_args = ";".join(args)
-        parsed_args = END_OF_LINE.join([
-            f'[{get_now_as_str(log_date_format)}] - {line}'
-            for line in parsed_args.split(END_OF_LINE)
-        ])
-
-        fw.write(parsed_args + END_OF_LINE)
-
-    if not DEBUG:
-        return
-
-    if display:
-        print(*args)
+LOGGER_INSTANCE: Logger = None
 
 
 def get(url: str):
@@ -82,7 +51,7 @@ def get(url: str):
         response = requests.get(url)
         return response.content
     except:
-        log(t('ERRORS.GET_PAGE', {'url': url}))
+        LOGGER_INSTANCE.log(t('ERRORS.GET_PAGE', {'url': url}))
         return None
 
 
@@ -91,7 +60,7 @@ def parse_html(raw_html: str):
 
 
 def get_chapters(start_at: int = 1):
-    log(t('CHAPTERS.GET_ALL', {'start_at': start_at}))
+    LOGGER_INSTANCE.log(t('CHAPTERS.GET_ALL', {'start_at': start_at}))
     content = get(CONF['BASE_URL'])
     soup = parse_html(content)
 
@@ -128,7 +97,8 @@ def download_img(dir: str, img_details: List[str]):
     filename = get_image_filename(filename)
 
     if not url or not validators.url(url):
-        log(t('ERRORS.INVALID_URL', {'filename': filename, 'url': url}))
+        LOGGER_INSTANCE.log(
+            t('ERRORS.INVALID_URL', {'filename': filename, 'url': url}))
         return
 
     img_content = requests.get(url, stream=True)
@@ -136,7 +106,7 @@ def download_img(dir: str, img_details: List[str]):
     with open(join_paths(CONF['BASE_DIR'], dir, filename), "wb") as img_file:
         shutil.copyfileobj(img_content.raw, img_file)
 
-    log(t('IMAGES.IMAGE_SUCCESS', {'filename': filename}))
+    LOGGER_INSTANCE.log(t('IMAGES.IMAGE_SUCCESS', {'filename': filename}))
 
 
 def empty_threads():
@@ -145,7 +115,7 @@ def empty_threads():
 
 
 def wait_all_threads():
-    log(t('THREADS.WAIT_ALL'))
+    LOGGER_INSTANCE.log(t('THREADS.WAIT_ALL'))
 
     for thread in CONF['THREADS']:
         thread.join()
@@ -164,7 +134,8 @@ def threadify(target, args):
 
 def download_imgs(show_progress: bool, title: str, imgs: List[str]):
     total_imgs = len(imgs)
-    log(t('IMAGES.FOUND_TOTAL_IMAGES', {'total_imgs': total_imgs}))
+    LOGGER_INSTANCE.log(t('IMAGES.FOUND_TOTAL_IMAGES',
+                          {'total_imgs': total_imgs}))
 
     THREADS: List[threading.Thread] = []
 
@@ -189,15 +160,16 @@ def download_imgs(show_progress: bool, title: str, imgs: List[str]):
                   'total_imgs': total_imgs
                   })
         except:
-            log(t('ERRORS.IMAGE_DIDNT_DOWNLOAD', {'img': img}))
+            LOGGER_INSTANCE.log(t('ERRORS.IMAGE_DIDNT_DOWNLOAD', {'img': img}))
             not_downloaded.append(img)
 
     for thread in THREADS:
         thread.join()
 
-    log(t('IMAGES.IMAGES_DOWNLOADED'))
+    LOGGER_INSTANCE.log(t('IMAGES.IMAGES_DOWNLOADED'))
     if len(not_downloaded) > 0:
-        log('IMAGES.NOT_DOWNLOADED', {'not_downloaded': len(not_downloaded)})
+        LOGGER_INSTANCE.log('IMAGES.NOT_DOWNLOADED', {
+                            'not_downloaded': len(not_downloaded)})
 
 
 def rename_imgs(imgs: List[str]) -> List[str]:
@@ -230,12 +202,12 @@ def get_chapter(chapter_url: str, show_progress: bool = True, limit: int = CONF[
             parsed_chapter_url = f'{CONF["DOMAIN"]}{CONF["URL_SEPARATOR"]}{parsed_chapter_url}'
 
     if not validators.url(parsed_chapter_url):
-        log(t('ERRORS.INVALID_CHAPTER_URL', {
+        LOGGER_INSTANCE.log(t('ERRORS.INVALID_CHAPTER_URL', {
             'chapter_url': parsed_chapter_url}))
         return None
 
-    log(t('CHAPTERS.CHAPTER_DOWNLOAD_STARTS',
-        {'chapter_url': parsed_chapter_url}))
+    LOGGER_INSTANCE.log(t('CHAPTERS.CHAPTER_DOWNLOAD_STARTS',
+                          {'chapter_url': parsed_chapter_url}))
 
     title = parse_chapter_title(chapter_url)
 
@@ -256,7 +228,7 @@ def get_chapter(chapter_url: str, show_progress: bool = True, limit: int = CONF[
 
 
 def detect_missing_imgs(stacktrace: bool = True):
-    log(t('CHAPTERS.CORRUPT_CHAPTERS_DETECTION'))
+    LOGGER_INSTANCE.log(t('CHAPTERS.CORRUPT_CHAPTERS_DETECTION'))
     incomplete_chapters = []
 
     chapters_path = join_paths(CONF['BASE_DIR'], CONF['CHAPTERS_FOLDER'])
@@ -264,7 +236,7 @@ def detect_missing_imgs(stacktrace: bool = True):
     chapters = [elem for elem in dir_elements if not isfile(elem)]
 
     for chapter in chapters:
-        log(t('IMAGES.ANALYZING_IMAGES', {'chapter': chapter}))
+        LOGGER_INSTANCE.log(t('IMAGES.ANALYZING_IMAGES', {'chapter': chapter}))
 
         chapter_path = join_paths(chapters_path, chapter)
         chapter_elements = listdir(chapter_path)
@@ -280,7 +252,7 @@ def detect_missing_imgs(stacktrace: bool = True):
             try:
                 new_imgs.append(int(img.split('-')[-1]))
             except:
-                log(t('ERRORS.PARSE_ERROR'))
+                LOGGER_INSTANCE.log(t('ERRORS.PARSE_ERROR'))
         imgs = new_imgs
 
         imgs.sort()
@@ -297,7 +269,7 @@ def detect_missing_imgs(stacktrace: bool = True):
                 filesize = 0
             if (not int(img) == (index + 1)) | (not filesize > 0):
                 if stacktrace:
-                    log(t('ERRORS.CORRPUT_IMAGE_FOUND', {
+                    LOGGER_INSTANCE.log(t('ERRORS.CORRPUT_IMAGE_FOUND', {
                         'chapter': chapter,
                         'index': (index + 1),
                         'extension': CONF['FILE_EXTENSION'],
@@ -310,8 +282,6 @@ def detect_missing_imgs(stacktrace: bool = True):
 
 
 def scrape(props: ScrapeProps) -> None:
-    global NOW_AS_STR
-
     cls()
     check_folder_or_create(CONF['BASE_DIR'])
 
@@ -326,7 +296,7 @@ def scrape(props: ScrapeProps) -> None:
         join_paths(CONF['BASE_DIR'], CONF['CHAPTERS_FOLDER'])
     )
 
-    log(t('CHAPTERS.TOTAL_CHAPTERS_RETRIEVED', {
+    LOGGER_INSTANCE.log(t('CHAPTERS.TOTAL_CHAPTERS_RETRIEVED', {
         'chapter_links': len(usable_props['chapter_links'])
     }))
 
@@ -337,12 +307,10 @@ def scrape(props: ScrapeProps) -> None:
 
     if usable_props['detect_corrupt']:
         incomplete_chapters = detect_missing_imgs()
-        log(t('CHAPTERS.TOTAL_CORRUPTED_CHAPTERS', {
+        LOGGER_INSTANCE.log(t('CHAPTERS.TOTAL_CORRUPTED_CHAPTERS', {
             'total_incomplete_chapters': len(incomplete_chapters),
             'incomplete_chapters': END_OF_LINE.join(incomplete_chapters)
         }))
-
-    NOW_AS_STR = None
 
 
 def detect_updates(chapters: List[str] = None):
@@ -371,19 +339,19 @@ def detect_updates(chapters: List[str] = None):
 def download_updates():
     updates = detect_updates()
 
-    log(t('UPDATES.NEWS_ARE', {'updates': updates}))
+    LOGGER_INSTANCE.log(t('UPDATES.NEWS_ARE', {'updates': updates}))
 
     prompt = t('UPDATES.DOWNLOAD_PROMPT')
     option = input(prompt)
 
-    log(t('UPDATES.CHOSEN_OPTION', {'option': option}))
+    LOGGER_INSTANCE.log(t('UPDATES.CHOSEN_OPTION', {'option': option}))
 
     if option.lower() not in ['s', 'y']:
-        return log(t('UPDATES.NOT_DOWNLOADING_NEWS'))
+        return LOGGER_INSTANCE.log(t('UPDATES.NOT_DOWNLOADING_NEWS'))
 
     scrape(chapter_links=updates, detect_corrupt=False)
 
-    log(t('UPDATES.NEWS_DOWNLOADED'))
+    LOGGER_INSTANCE.log(t('UPDATES.NEWS_DOWNLOADED'))
 
 
 def set_configuration(configuration: ConfigType) -> None:
@@ -401,6 +369,8 @@ def set_configuration(configuration: ConfigType) -> None:
 
 def start(conf: ConfigType, props: ScrapeProps) -> None:
     """Starts all the processes"""
+    global LOGGER_INSTANCE
+
     set_configuration(conf)
 
     default_scrape_props: ScrapeProps = {
@@ -410,6 +380,8 @@ def start(conf: ConfigType, props: ScrapeProps) -> None:
         'limit_chapters': EVERYTHING,
         'start_at': 1,
     }
+
+    LOGGER_INSTANCE = Logger()
 
     scrape({
         **default_scrape_props,
