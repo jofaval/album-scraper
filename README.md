@@ -12,6 +12,8 @@ You can watch the changelog at [CHANGELOG](./CHANGELOG.md), it's an overall view
 1. [How does it work?](#how-does-it-work)
    1. [Requirements](#requirements)
    1. [Installation](#installation)
+   1. [Create a module](#create-a-module)
+   1. [Executing a module](#executing-a-module)
 1. [What pages does it work on?](#what-pages-does-it-work-on)
 1. [Legal notice](#legal-notice)
 
@@ -79,9 +81,13 @@ since python will be installed by default pip3
 
 ### Create a module
 
+[Back to the contents](#contents)
+
 Folow the [example](./modules/example/).
 
 ### Executing a module
+
+[Back to the contents](#contents)
 
 To execute it, simply create an `__init__.py` at the root for the [`modules`](./modules/) folder. And "export" the desired init function to execute, the `__main__.py` will handle the rest:
 
