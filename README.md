@@ -41,9 +41,15 @@ Started more than a year ago and I applied little modifications here and there, 
 
 [Back to the contents](#contents)
 
-You'll have to execute the `scrape` method at the moment, but module integration is not finished yet.
+Folow the [example](./modules/example/).
 
-**_To be defined_**
+To execute it, simply create an `__init__.py` at the root for the [`modules`](./modules/) folder. And "export" the desired init function to execute, the `__main__.py` will handle the rest:
+
+```python
+from .example import init
+```
+
+Or watch out for the CLI, which might make it easier, and with more options
 
 ### Requirements
 

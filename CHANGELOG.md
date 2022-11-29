@@ -11,10 +11,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Translate the logger into a class with shared state
 - Implement a Requested (name suggestable to changes)
 - Images will now download in bulk after scraping them from the chapters
+- Finally "finished" an example, a quick one at that
+- Use Pool executor now instead of a manual Thread "queue"
 
 ### Modified
 
 - Move a ton of logic into models
+- Cleaned up the code
 
 ## 2022-11-27
 
