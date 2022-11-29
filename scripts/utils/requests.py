@@ -43,6 +43,13 @@ class Requester():
             self.logger.log(t('ERRORS.GET_PAGE', {'url': url}))
             return None
 
+    def get_parsed(self, url: str) -> Union[None, BeautifulSoup]:
+        content = self.get(url)
+        if not content:
+            return None
+
+        return self.parse_html(content)
+
     def parse_html(self, raw_html: str) -> BeautifulSoup:
         return BeautifulSoup(raw_html, features=self.parser)
 

@@ -9,6 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - Translate the logger into a class with shared state
+- Implement a Requested (name suggestable to changes)
+- Images will now download in bulk after scraping them from the chapters
+
+### Modified
+
+- Move a ton of logic into models
 
 ## 2022-11-27
 

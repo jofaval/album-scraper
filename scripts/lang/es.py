@@ -29,6 +29,7 @@ STRINGS: Dict[str, str] = {
         'IMAGES_DOWNLOADED': 'Ya se han descargado todas las imágenes del capítulo',
         'NOT_DOWNLOADED': 'No se ha(n) podido descargar {{not_downloaded}} imágen(es)',
         'ANALYZING_IMAGES': 'Analizando las imágenes del capítulo {{chapter}}',
+        'IMAGE_ATTEMPT': 'Se intenta descargar la imagen "{{url}}", intento: ({{attempt}}/{{max_retries}})',
     },
     'THREADS': {
         'WAIT_ALL': 'Se espera a que terminen el resto de hilos',
