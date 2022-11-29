@@ -35,7 +35,9 @@ Why act like a robot when a robot can do it for you?
 
 [Back to the contents](#contents)
 
-Started more than a year ago and I applied little modifications here and there, iterating, and finally decided to try and encapsulate it for module usage
+Started more than a year ago and I applied little modifications here and there, iterating, and finally decided to try and encapsulate it for module usage.
+
+It started as an assignment, from which I was reminded of the existence of webscraping as a technique, and an opportunity to automate one routine I had arised. I expanded upon it until I've decided to publish it on open-source it.
 
 ## How does it work?
 
