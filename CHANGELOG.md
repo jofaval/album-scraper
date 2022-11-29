@@ -56,7 +56,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Cleaned the code a little bit
 
-_[...] Iterations_
+## _[...]_
+
+### _Iterations_
 
 ## 2022-11-5
 
