@@ -20,23 +20,6 @@ from ..utils.system import check_folder_or_create, cls
 from multiprocessing import Pool, cpu_count
 
 
-class ChapterScraperThread(TypedDict):
-    chapter: Chapter
-    imgs_per_chapter: int
-
-    pass
-
-
-class ImageDownloadThread(TypedDict):
-    show_progress: bool
-    image: Image
-    index: int
-    total_imgs: int
-    not_downloaded: List[str]
-
-    pass
-
-
 class Album(BaseModel):
     """An instance of an Album"""
     chapters: List[Chapter]

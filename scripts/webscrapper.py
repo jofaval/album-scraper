@@ -12,7 +12,7 @@ from typing import List
 from .constants import END_OF_LINE, EVERYTHING
 # types
 from .config.type import ConfigType
-from .types import ScrapeProps
+from .models.album_types import ScrapeProps
 # custom translator
 from .lang import t
 # utils

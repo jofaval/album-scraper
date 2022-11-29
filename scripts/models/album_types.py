@@ -1,5 +1,25 @@
+# types
 from dataclasses import dataclass
 from typing import List, TypedDict
+from .chapter import Chapter
+from .image import Image
+
+
+class ChapterScraperThread(TypedDict):
+    chapter: Chapter
+    imgs_per_chapter: int
+
+    pass
+
+
+class ImageDownloadThread(TypedDict):
+    show_progress: bool
+    image: Image
+    index: int
+    total_imgs: int
+    not_downloaded: List[str]
+
+    pass
 
 
 @dataclass
