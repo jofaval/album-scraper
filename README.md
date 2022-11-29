@@ -41,16 +41,6 @@ Started more than a year ago and I applied little modifications here and there, 
 
 [Back to the contents](#contents)
 
-Folow the [example](./modules/example/).
-
-To execute it, simply create an `__init__.py` at the root for the [`modules`](./modules/) folder. And "export" the desired init function to execute, the `__main__.py` will handle the rest:
-
-```python
-from .example import init
-```
-
-Or watch out for the CLI, which might make it easier, and with more options
-
 ### Requirements
 
 [Back to the contents](#contents)
@@ -84,6 +74,28 @@ pip install -r requirements.txt # pip3 for any unix system
 ```
 
 since python will be installed by default pip3
+
+### Create a module
+
+Folow the [example](./modules/example/).
+
+### Executing a module
+
+To execute it, simply create an `__init__.py` at the root for the [`modules`](./modules/) folder. And "export" the desired init function to execute, the `__main__.py` will handle the rest:
+
+```python
+from .example import init
+```
+
+And run the project, at the root:
+
+```bash
+python . # python3 for unix/linux
+# or run the project folder
+python album-scraper
+```
+
+Or watch out for the CLI, which might make it easier, and with more options
 
 ## What pages does it work on?
 
