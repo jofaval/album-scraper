@@ -6,6 +6,7 @@ specifiers:
   autoprefixer: ^10.4.12
   client-zip: ^2.3.0
   postcss: ^8.4.18
+  solid-headless: ^0.13.0
   solid-js: ^1.6.0
   solid-start: ^0.2.0
   solid-start-node: ^0.2.0
@@ -18,6 +19,7 @@ dependencies:
   '@solidjs/meta': 0.28.2_solid-js@1.6.2
   '@solidjs/router': 0.5.1_solid-js@1.6.2
   client-zip: 2.3.0
+  solid-headless: 0.13.0_solid-js@1.6.2
   solid-js: 1.6.2
   solid-start: 0.2.5_i2cnpwj3ojjdnkycik5yjsstli
   undici: 5.13.0
@@ -2724,6 +2726,16 @@ packages:
       mrmime: 1.0.1
       totalist: 3.0.0
 
+  /solid-headless/0.13.0_solid-js@1.6.2:
+    resolution: {integrity: sha512-N118iPl7W5lyug4K+4c0cwM8YR2yEVJ/3H4wq6tVijATHfXfLnB1ACFI5GGHSXlwu70PUzaGSKwcVqLlloUMyA==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      solid-js: ^1.2
+    dependencies:
+      solid-js: 1.6.2
+      solid-use: 0.5.0_solid-js@1.6.2
+    dev: false
+
   /solid-js/1.6.2:
     resolution: {integrity: sha512-AZBsj+Yn1xliniTTeuQKG9V7VQVkQ8lZmSKvBjpcVSoZeF7nvt/N5f7Kcsx6QSufioa2YgvBjkIiA0cM0qhotw==}
     dependencies:
@@ -2806,6 +2818,15 @@ packages:
       wait-on: 6.0.1_debug@4.3.4
     transitivePeerDependencies:
       - supports-color
+
+  /solid-use/0.5.0_solid-js@1.6.2:
+    resolution: {integrity: sha512-z1AaS99SL3gNP70K4+XIVKGXDRI56m3Q6Q4X63bfgw0kaN6cwT4SAyFZAmIRjHcvf5rOMRQfNgUV4YVDha+LcQ==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      solid-js: ^1.2
+    dependencies:
+      solid-js: 1.6.2
+    dev: false
 
   /source-map-js/1.0.2:
     resolution: {integrity: sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==}
