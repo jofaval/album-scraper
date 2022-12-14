@@ -7,11 +7,12 @@ from os.path import join
 # types
 from pydantic import BaseModel
 
-# constants
-from ..constants import ENCODING, END_OF_LINE
-from .constants import DEFAULT_EXTENSION, DEFAULT_FOLDER_NAME, DEFAULT_LOG_DATE_FORMAT, WRITE_MODE
 # utils
-from ..utils import check_folder_or_create, get_now_as_str
+from scripts.utils.dates import get_now_as_str
+from scripts.utils.system import check_folder_or_create
+# constants
+from scripts.constants import ENCODING, END_OF_LINE
+from .constants import DEFAULT_EXTENSION, DEFAULT_FOLDER_NAME, DEFAULT_LOG_DATE_FORMAT, WRITE_MODE
 
 
 class Logger(BaseModel):

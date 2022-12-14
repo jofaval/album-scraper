@@ -4,6 +4,12 @@ The log of changes on the project/repository.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 2022-12-14
+
+### Fixed
+
+- Reduced the number of cyclical imports
+
 ## 2022-11-30
 
 ### Added

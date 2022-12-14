@@ -6,7 +6,8 @@ Also serves as the umbrella for all lang-related content
 # functions
 from functools import reduce
 # types
-from typing import TypedDict, Dict
+from typing import Dict
+from typing_extensions import TypedDict
 # constants
 from scripts.constants import END_OF_LINE
 # multilang
@@ -81,7 +82,7 @@ def translate(key: str, params: dict = None, options: OptionsDict = DEFAULT_OPTI
     return raw_string.replace('\n', END_OF_LINE)
 
 
-def t(key: str, params: dict = None, options: OptionsDict = DEFAULT_OPTIONS) -> str:
+def t(key: str, params: dict = None, options: OptionsDict = None) -> str:
     """
     Translates a string, with params
 
@@ -92,4 +93,7 @@ def t(key: str, params: dict = None, options: OptionsDict = DEFAULT_OPTIONS) -> 
 
     return str
     """
+    if not options:
+        options = DEFAULT_OPTIONS
+
     return translate(key, params, options)

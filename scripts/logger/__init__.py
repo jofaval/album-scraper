@@ -2,4 +2,4 @@
 Exports for the logger
 """
 
-from logger import Logger
+from .logger import Logger

@@ -1,8 +1,13 @@
-import threading
-from typing import List, TypedDict
+"""
+Common scraping configuration
+"""
+
+from typing import Any, List
+from typing_extensions import TypedDict
 
 
 class ConfigType(TypedDict):
+    """Configuration properties for the scraper"""
     DOMAIN: str
     """Domain of the target page to scrape"""
     BASE_URL: str
@@ -27,9 +32,9 @@ class ConfigType(TypedDict):
     """The log's file extension, `.log.txt` by default"""
 
     SHOULD_RENAME_IMAGES: bool
-    """It's so that the downloded images are numeric and not the usual hash id (by usual, I mean somewhat common)"""
+    """It's so that the downloaded images are numeric and not the usual hash id (by usual, I mean somewhat common)"""
 
-    THREADS: List[threading.Thread]
+    THREADS: List[Any]
     """The array of threads, should be later deprecated for a queue or pool"""
     LIMIT_THREADS: int
     """The max amount of concurrent workers"""

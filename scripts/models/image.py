@@ -8,23 +8,26 @@ from os.path import join
 # types
 from typing import Any
 from pydantic import BaseModel
-from ..utils import Requester
-from ..logger import Logger
+from scripts.core import Requester
+from scripts.logger import Logger
 # constants
-from ..constants import DEFAULT_IMG_DOWNLOAD_RETRIES
+from scripts.constants import DEFAULT_IMG_DOWNLOAD_RETRIES
 # models
-from .chapter import Chapter
 # translator
-from ..lang import t
+from scripts.lang import t
 # utils
-from ..utils import pad
+from scripts.utils import pad
 
 SINGLE_RETRY = 1
 
 
 class Image(BaseModel):
     """An instance of a Chapter's Image"""
-    chapter: Chapter
+    class Config():
+        """Inner Pydantic Config"""
+        arbitrary_types_allowed = True
+
+    chapter: Any
     url: str
     index: int
     should_be_renamed: bool = False

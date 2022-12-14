@@ -9,24 +9,28 @@ from os.path import join
 # types
 from typing import List, Union
 from pydantic import BaseModel
-from logger import Logger
 from bs4 import Tag
 # utils
 from validators import url as is_url
-# types
-from ..utils import Requester
-from ..models.album import Album
+# translator
+from scripts.lang import t
 # constants
-from ..constants import EVERYTHING
+from scripts.constants import EVERYTHING
+from scripts.logger import Logger
+# types
+from scripts.core.requests import Requester
+from .album import Album
 # models
 from .image import Image
-from ..utils import check_folder_or_create, pad
-# translator
-from ..lang import t
+from scripts.utils import check_folder_or_create, pad
 
 
 class Chapter(BaseModel):
     """An instance of an album chapter"""
+    class Config():
+        """Inner Pydantic Config"""
+        arbitrary_types_allowed = True
+
     images: List[Image]
     index: int
     should_be_indexed: bool

@@ -12,12 +12,13 @@ from bs4 import Tag
 import cchardet  # only needs to be imported, not used
 
 # logger
-from ..logger.logger import Logger
+from scripts.logger.logger import Logger
 # custom translator
-from ..lang import t
+from scripts.lang import t
 
 
 class Requester():
+    """Abstraction class for the album requests"""
     logger: Logger
     """The logger instance"""
 
@@ -47,7 +48,7 @@ class Requester():
         try:
             response = get(url, timeout=self.timeout)
             return response.content
-        except:
+        except Exception:
             self.logger.log(t('ERRORS.GET_PAGE', {'url': url}))
             return None
 

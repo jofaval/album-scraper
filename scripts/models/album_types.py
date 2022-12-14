@@ -4,15 +4,14 @@ Types for the album model
 
 # types
 from dataclasses import dataclass
-from typing import List, TypedDict
-from .chapter import Chapter
-from .image import Image
+from typing import Any, List
+from typing_extensions import TypedDict
 
 
 class ChapterScraperThread(TypedDict):
     """Props for the chapter scraping thread"""
 
-    chapter: Chapter
+    chapter: Any
     imgs_per_chapter: int
 
 
@@ -20,7 +19,7 @@ class ImageDownloadThread(TypedDict):
     """Props for the image download thread"""
 
     show_progress: bool
-    image: Image
+    image: Any
     index: int
     total_imgs: int
     not_downloaded: List[str]
