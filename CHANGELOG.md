@@ -4,6 +4,12 @@ The log of changes on the project/repository.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 2023-04-11
+
+### Added
+
+- Base JavaScript Queue structure
+
 ## 2022-12-14
 
 ### Fixed
