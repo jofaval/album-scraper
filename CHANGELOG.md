@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 2023-04-16
 
+### Added
+
+- Integrated downloads
+- Integrated threading and processing pooling
+- Implemented retries
+- Implement `logging`
+- Implemented download dir
+
 ### Modified
 
 - Fixed typos on the main README

@@ -98,6 +98,8 @@ class AlbumConfig(BaseModel):
     # album
     chapter_link_query: str
     """CSS query to get the chapters links"""
+    download_dir: str = os.path.dirname(__file__)
+    """The directory to download the album in, if it doesn't exist, it will create it"""
     get_link_from_tag: Union[Callable[[Tag], None], None]
     """Extracts the link from the chapter tag"""
     is_reverse_order: bool = True
@@ -343,6 +345,7 @@ class ImageScraper():
         # return f'{chapter_index}-{config.chapter.name}/{image_index}-{meta_image_name}'
 
         return os.path.join(
+            config.chapter.album.download_dir,
             config.chapter.album.slug,
             f"{chapter_index}-{config.chapter.name}",
             f"{image_index}.{extension}"
