@@ -13,6 +13,8 @@ from album_config import AlbumConfig
 # TODO: implement a health checker, missing images? missing values in a sorted list of ints
 # TODO: implement a sanitizer, download those missing images
 # TODO: implement a modular system with folders and configuration files
+# TODO: log to file with dates
+# TODO: implement a multilanguage logging utility
 
 
 def start() -> None:

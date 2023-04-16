@@ -19,6 +19,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Fixed typos on the main README
 
+### Deleted
+
+- Legacy version
+
 ## 2023-04-15
 
 ### Added
