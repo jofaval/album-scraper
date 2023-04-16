@@ -1,17 +1,11 @@
 """Album"""
 
 import logging
-import os
-import shutil
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Pool
 from operator import attrgetter
 # from multiprocessing import Pool
-from typing import Callable, Generator, List, Tuple, Union
-
-from bs4 import BeautifulSoup, Tag
-from pydantic import BaseModel
-from requests import Response, get
+from typing import Generator, List, Tuple
 
 from album_chapters_scraper import AlbumChaptersScraper
 from album_config import AlbumConfig
