@@ -8,7 +8,9 @@ Main entrypoint and workflow for the scraper
 # |---------------------------|
 
 import logging
-import urllib.request
+import os
+import shutil
+from concurrent.futures import ThreadPoolExecutor
 from typing import Callable, List, Union
 
 from bs4 import BeautifulSoup, Tag
@@ -25,38 +27,63 @@ def is_valid_url(url: str) -> bool:
     return not url or not is_url(url)
 
 
-def get_url_content(url: str, timeout: float = 25):
+def get_url_content(
+        url: str,
+        timeout: float = 25,
+        should_retry: bool = True,
+        retry_times: int = 3
+):
     """Retrieves the URL's content"""
     if is_valid_url(url):
         return None
 
-    try:
-        # https://www.whatismybrowser.com/detect/what-http-headers-is-my-browser-sending?sort=dont-sort
-        headers = {
-            # "Content-Type": "",
-            # "Content-Length": "",
-            # "Host": "www.whatismybrowser.com",
-            "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:109.0) Gecko/20100101 Firefox/111.0",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-            "Accept-Language": "es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Referer": "https://www.google.com/",
-            # "Upgrade-Insecure-Requests": "1",
-            # "Sec-Fetch-Dest": "document",
-            # "Sec-Fetch-Mode": "navigate",
-            # "Sec-Fetch-Site": "same-origin",
-            # "Sec-Fetch-User": "?1",
-            # "Sec-Gpc": "1",
-            # "Te": "trailers",
-        }
-        response = get(
-            url,
-            timeout=timeout,
-            headers=headers
-        )
-        return response.content
-    except Exception:
-        # logger.log(t('ERRORS.GET_PAGE', {'url': url}))
+    # https://www.whatismybrowser.com/detect/what-http-headers-is-my-browser-sending?sort=dont-sort
+    headers = {
+        # "Content-Type": "",
+        # "Content-Length": "",
+        # "Host": "www.whatismybrowser.com",
+        "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:109.0) Gecko/20100101 Firefox/111.0",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language": "es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Referer": "https://www.google.com/",
+        # "Upgrade-Insecure-Requests": "1",
+        # "Sec-Fetch-Dest": "document",
+        # "Sec-Fetch-Mode": "navigate",
+        # "Sec-Fetch-Site": "same-origin",
+        # "Sec-Fetch-User": "?1",
+        # "Sec-Gpc": "1",
+        # "Te": "trailers",
+    }
+
+    retry_attempt = 0
+    max_retry = retry_times if should_retry else -1
+
+    while True:
+        if retry_attempt >= 1:
+            logging.warning(
+                "Retrying %s for the %d failed attempt(s)", url, retry_attempt
+            )
+
+        try:
+            response = get(
+                url,
+                timeout=timeout,
+                # headers=headers,
+                allow_redirects=True
+            )
+
+            if not response.ok:
+                raise Exception(f'Response for "{url}" failed')
+
+            return response.content
+        except Exception as error:
+            logging.exception(error)
+        finally:
+            retry_attempt += 1
+            if retry_attempt >= max_retry:
+                break
+
         return None
 
 
@@ -69,6 +96,10 @@ class AlbumConfig(BaseModel):
     get_chapter_name: Callable[[str], str]
     image_source_query: str
     get_source_from_tag: Union[Callable[[BeautifulSoup], str], None]
+    chapter_index_len: int = 4
+    image_index_len: int = 3
+    slug: str
+    get_chapter_index: Union[Callable[[str], int], None]
 
 
 class Scraper():
@@ -82,12 +113,11 @@ class Scraper():
         if not content:
             return None
 
-        return BeautifulSoup(content, features="lxml-xml")
+        return BeautifulSoup(content, features="lxml")
 
     def scrape_url(self, url: str) -> Union[BeautifulSoup, None]:
         """Gets the url's content"""
         content = get_url_content(url)
-
         if not content:
             logging.warning("No content was retrieved from: %s", url)
             return None
@@ -144,7 +174,7 @@ class AlbumChaptersScraper(Scraper):
             if not links_from_content:
                 continue
 
-            chapter_links.append(links_from_content)
+            chapter_links.extend(links_from_content)
 
         return chapter_links
 
@@ -202,36 +232,76 @@ class ChapterScraper(Scraper):
         if not content:
             return None
 
+        image_sources = self.get_images_sources_from_content(content, config)
+        if not image_sources:
+            return None
+
         return [
             ImageConfig(url=image, index=index, chapter=config)
-            for index, image in enumerate(self.get_images_sources_from_content(content, config))
+            for index, image in enumerate(image_sources)
         ]
 
 
 class ImageScraper():
     """Scrapes an image and properly retrieves it's metadata"""
 
-    def get_metadata(self) -> None:
-        """Gets the image metadata"""
-
-    def save(self, content: str, meta_image_name: str) -> None:
+    def save(self, content: str, image_path: str) -> None:
         """Writes the image into a file"""
+        image_path_dir = os.path.dirname(image_path)
+        if not os.path.exists(image_path_dir):
+            os.makedirs(image_path_dir)
 
-    def get_image_path(self, meta_image_name: str, config: ImageConfig) -> str:
+        with open(image_path, 'wb') as writer:
+            shutil.copyfileobj(content, writer)
+
+    def get_image_extension(self, format: str) -> str:
+        """Parses the image format into an extension"""
+        if format == "image/jpeg":
+            return "jpg"
+        elif format == "image/png":
+            return "png"
+
+        return "jpg"
+
+    def get_image_path(self, meta_image_name: str, config: ImageConfig, format: str) -> str:
         """Generates the image's final path"""
-        # TODO: move to configuration, at least to a constant
-        chapter_index = str(config.chapter.index).zfill(4)
-        # TODO: move to configuration, at least to a constant
-        image_index = str(config.index).zfill(3)
+        chapter_index = str(config.chapter.index).zfill(
+            config.chapter.album.chapter_index_len
+        )
+        image_index = str(config.index).zfill(
+            config.chapter.album.image_index_len
+        )
 
-        return f'{chapter_index}-{config.chapter.name}/{image_index}-{meta_image_name}'
+        extension = self.get_image_extension(format)
+        # return f'{chapter_index}-{config.chapter.name}/{image_index}-{meta_image_name}'
+
+        return os.path.join(
+            config.chapter.album.slug,
+            f"{chapter_index}-{config.chapter.name}",
+            f"{image_index}.{extension}"
+        )
 
     def scrape(self, config: ImageConfig) -> None:
         """Scrapes an image and writes it with metadata"""
-        image = urllib.request.urlretrieve(config.url)
-        # image = Image.open(config.url)
-        logging.info("image %s", image)
-        # logging.warning({"name": image.filename, "format": image.format})
+        logging.info("Attempting image download for %s", config.url)
+        response = get(config.url, stream=True, timeout=30)
+        if not response.ok:
+            logging.warning("%s could not be downloaded", config.url)
+            return None
+
+        image_path = self.get_image_path(
+            # TODO: properly detect the image name, or content-disposition
+            # meta_image_name=config.url.split("/")[-1],
+            meta_image_name="",
+            config=config,
+            format=response.headers.get("Content-Type")
+        )
+
+        # TODO: implement base path
+        self.save(response.raw, image_path)
+        # TODO: implement proper threading with file as tuple space
+
+        return None
 
 
 class Album():
@@ -275,7 +345,8 @@ class Album():
                 image_source_query=self.config.image_source_query,
                 get_source_from_tag=self.config.get_source_from_tag,
                 # TODO: careful with subsets of chapters, a more complex method should be provided
-                index=index,
+                index=self.config.get_chapter_index(chapter_link)
+                if self.config.get_chapter_index else index,
                 album=self.config,
             )
             for index, chapter_link in enumerate(chapters_links)
@@ -291,10 +362,10 @@ class Album():
             images_configs.extend(inner_images_configs)
 
         # TODO: remove, for testing purposes, use the whole
-        images_configs = images_configs[:1]
+        # images_configs = images_configs[:1]
 
-        for image_config in images_configs:
-            self.image_scraper.scrape(image_config)
+        with ThreadPoolExecutor() as pool:
+            pool.map(self.image_scraper.scrape, images_configs)
 
 
 def start() -> None:
@@ -314,10 +385,11 @@ def start() -> None:
 
         return chapter_url.split("/")[-1]
 
-
     # TODO: implement download path
+
     # Example config
     album_config = AlbumConfig(
+        slug="example",
         chapter_link_query=".chapters li a",
         starting_url="https://favorite-album.com/album/",
         is_reverse_order=True,
