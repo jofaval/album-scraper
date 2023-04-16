@@ -2,7 +2,6 @@
 
 import logging
 import os
-from logging import _Level
 from typing import Callable, Union
 
 from bs4 import BeautifulSoup, Tag
@@ -24,7 +23,7 @@ class AlbumConfig(BaseModel):
     """Filepath slug for the album"""
     starting_url: str
     """Base url from which to scrape the chapters links"""
-    logging_level: _Level = logging.INFO
+    logging_level: int = logging.INFO
     """Desired logging level"""
 
     # chapters

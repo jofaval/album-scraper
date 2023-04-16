@@ -5,8 +5,7 @@ Main entrypoint and workflow for the scraper
 import logging
 
 from album import Album
-
-from .configs import album_config
+from configs import album_config
 
 # TODO: refactor into generators as much as possible for an efficient memory usage
 # TODO: implement a detect updates, new chapters not found locally

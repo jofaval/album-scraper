@@ -6,6 +6,7 @@ import shutil
 # from multiprocessing import Pool
 from typing import Union
 
+import cchardet
 from requests import Response, get
 
 from image_config import ImageConfig

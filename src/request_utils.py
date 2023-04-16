@@ -2,10 +2,9 @@
 
 import logging
 
+import cchardet
 from requests import get
 from validators import url as is_url
-
-# from multiprocessing import Pool
 
 
 def is_valid_url(url: str) -> bool:
