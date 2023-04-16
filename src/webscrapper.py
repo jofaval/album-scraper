@@ -314,6 +314,8 @@ def start() -> None:
 
         return chapter_url.split("/")[-1]
 
+
+    # TODO: implement download path
     # Example config
     album_config = AlbumConfig(
         chapter_link_query=".chapters li a",

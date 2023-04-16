@@ -29,7 +29,7 @@ It's not perfect, it's straight to the point. It (somewhat) complies with Pylint
 
 [Back to the contents](#contents)
 
-It's really annoying to keep downloading and organizing images you're downloading, for whatever that reason may be, and doing it all that work manually, too much mental overheat, what if you missed one image? how do you check it? they're unorganized by name, will you manually rename them? how many will you miss while doing so? and many more...
+It's really annoying to download and organize those images, for whatever that reason may be, and doing it all that work manually, too much mental overhead, what if you skipped one image? how do you check it? they're unsorted, name may be the default (filename on the host), will you manually rename them? Jow many will you miss while doing so? And many more...
 
 Why act like a robot when a robot can do it for you?
 
@@ -37,7 +37,7 @@ Why act like a robot when a robot can do it for you?
 
 [Back to the contents](#contents)
 
-Started more than a year ago and I applied little modifications here and there, iterating, and finally decided to try and encapsulate it for module usage.
+Started more than a year ago, _at the time the project started, 2022_, and I applied little modifications here and there, iterating, and I finally decided to try and encapsulate it for a modular usage.
 
 It started as an assignment, from which I was reminded of the existence of webscraping as a technique, and an opportunity to automate one routine I had arised. I expanded upon it until I've decided to publish it on open-source it.
 
@@ -115,6 +115,6 @@ _Page layouts, Image designed with [excalidraw](https://excalidraw.com/)_
 
 [Back to the contents](#contents)
 
-I am not endorsing any illegal activities, images still hold their licensing and ownership but it's rightful author(s). If the robots.txt do not allow the officially legal webscraping of the website, any infrightful, mischiveous or illegal act will still be illegal, and not my reponsability.
+I am not endorsing any illegal activities, images still hold their licensing and ownership by it's rightful author(s). If the robots.txt does not allow the officially legal webscraping of the website, any unrightful, mischievous or illegal act will still be illegal, and not my responsibility.
 
-Use this scripts at your own responsability.
+Use this scripts at your own responsibility.
