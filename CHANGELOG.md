@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Implement `logging`
 - Implemented download dir
 - Code split the solution
+- Base refactor modules concept
 
 ### Modified
 
