@@ -7,12 +7,12 @@ from operator import attrgetter
 # from multiprocessing import Pool
 from typing import Generator, List, Tuple
 
-from album_chapters_scraper import AlbumChaptersScraper
-from album_config import AlbumConfig
-from chapter_config import ChapterConfig
-from chapter_scraper import ChapterScraper
-from image_config import ImageConfig
-from image_scraper import ImageScraper
+from src.album_chapters_scraper import AlbumChaptersScraper
+from src.album_config import AlbumConfig
+from src.chapter_config import ChapterConfig
+from src.chapter_scraper import ChapterScraper
+from src.image_config import ImageConfig
+from src.image_scraper import ImageScraper
 
 
 class Album():

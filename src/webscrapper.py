@@ -4,8 +4,8 @@ Main entrypoint and workflow for the scraper
 
 import logging
 
-from album import Album
-from configs import album_config
+from src.album import Album
+from src.configs import album_config
 
 # TODO: refactor into generators as much as possible for an efficient memory usage
 # TODO: implement a detect updates, new chapters not found locally
@@ -31,4 +31,6 @@ def start() -> None:
 
 
 if __name__ == "__main__":
-    start()
+    raise UserWarning(
+        "Incorrect usage: please, execute at the root of the project"
+    )

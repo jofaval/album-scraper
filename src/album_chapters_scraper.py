@@ -5,8 +5,8 @@ from typing import List, Union
 
 from bs4 import BeautifulSoup
 
-from album_config import AlbumConfig
-from scraper import Scraper
+from src.album_config import AlbumConfig
+from src.scraper import Scraper
 
 
 class AlbumChaptersScraper(Scraper):

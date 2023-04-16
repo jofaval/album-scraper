@@ -6,7 +6,7 @@ from typing import Callable, Union
 from bs4 import BeautifulSoup
 from pydantic import BaseModel
 
-from album_config import AlbumConfig
+from src.album_config import AlbumConfig
 
 
 class ChapterConfig(BaseModel):

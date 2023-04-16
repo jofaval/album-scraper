@@ -3,8 +3,8 @@
 import os
 from typing import List
 
-from album_config import AlbumConfig
-from chapter_config import ChapterConfig
+from src.album_config import AlbumConfig
+from src.chapter_config import ChapterConfig
 
 
 # TODO: instantiate as a configuration inside the album?

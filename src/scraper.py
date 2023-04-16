@@ -6,7 +6,7 @@ from typing import Union
 
 from bs4 import BeautifulSoup
 
-from request_utils import get_url_content
+from src.request_utils import get_url_content
 
 
 class Scraper():

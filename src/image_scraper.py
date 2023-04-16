@@ -9,7 +9,7 @@ from typing import Union
 import cchardet
 from requests import Response, get
 
-from image_config import ImageConfig
+from src.image_config import ImageConfig
 
 
 class ImageScraper():
@@ -19,7 +19,10 @@ class ImageScraper():
         """Writes the image into a file"""
         image_path_dir = os.path.dirname(image_path)
         if not os.path.exists(image_path_dir):
-            os.makedirs(image_path_dir)
+            try:
+                os.makedirs(image_path_dir)
+            except FileExistsError:
+                logging.warning("Attempted to recreate dir %s", image_path_dir)
 
         try:
             if os.path.exists(image_path):
@@ -55,6 +58,7 @@ class ImageScraper():
         extension = self.get_image_extension(img_format)
         # return f'{chapter_index}-{config.chapter.name}/{image_index}-{meta_image_name}'
 
+        # TODO: move album and chapter path generation to an external, reusable class
         return os.path.join(
             config.chapter.album.download_dir,
             config.chapter.album.slug,

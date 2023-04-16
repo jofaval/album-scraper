@@ -4,7 +4,7 @@
 
 from pydantic import BaseModel
 
-from chapter_config import ChapterConfig
+from src.chapter_config import ChapterConfig
 
 
 class ImageConfig(BaseModel):

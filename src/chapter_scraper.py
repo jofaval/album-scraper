@@ -5,9 +5,9 @@ from typing import List, Union
 
 from bs4 import BeautifulSoup
 
-from chapter_config import ChapterConfig
-from image_config import ImageConfig
-from scraper import Scraper
+from src.chapter_config import ChapterConfig
+from src.image_config import ImageConfig
+from src.scraper import Scraper
 
 
 class ChapterScraper(Scraper):
