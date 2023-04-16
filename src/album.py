@@ -59,7 +59,10 @@ class Album():
 
         return chapters_links
 
-    def generate_chapters_configs(self, chapters_links: List[str]) -> Generator[ChapterConfig, None, None]:
+    def generate_chapters_configs(
+        self,
+        chapters_links: List[str],
+    ) -> Generator[ChapterConfig, None, None]:
         """Generates the configuration for all the given chapters"""
         return (
             ChapterConfig(
@@ -100,11 +103,7 @@ class Album():
             return None
         logging.info("Chapters links were successfully retrieved")
 
-        # TODO: remove, for testing purposes
-        # chapters_links = chapters_links[:8]
-        # chapters_links = chapters_links[:5]
-        # chapters_links = chapters_links[8:10]
-        chapters_links = chapters_links[10:11]
+        chapters_links = chapters_links[self.config.chapter_start:self.config.chapter_end]
 
         logging.info("Generating configuration for the chapters scraping...")
         chapters_configs = self.generate_chapters_configs(chapters_links)
@@ -128,10 +127,12 @@ class Album():
 
         logging.info('Polishing the configuration for the images scraper')
         if images_configs and len(images_configs) > 1:
-            del images_configs[1].chapter.album.get_chapter_index
-            del images_configs[1].chapter.album.get_chapter_name
-            del images_configs[1].chapter.album.get_link_from_tag
-            del images_configs[1].chapter.album.get_source_from_tag
+            # Deletes local attributes so that it can be pickled (multiprocessing requirement)
+            dummy_album_config = images_configs[0].chapter.album
+            del dummy_album_config.get_chapter_index
+            del dummy_album_config.get_chapter_name
+            del dummy_album_config.get_link_from_tag
+            del dummy_album_config.get_source_from_tag
 
         logging.info('Starting images scraper')
         with Pool(processes=self.config.max_image_processes) as executor:
