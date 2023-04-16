@@ -4,6 +4,22 @@ The log of changes on the project/repository.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 2023-04-16
+
+### Modified
+
+- Fixed typos on the main README
+
+## 2023-04-15
+
+### Added
+
+- Started a new version of the script with classes in a single file (at least for now)
+
+### Modified
+
+- Moved from `scripts/` to `src/`
+
 ## 2023-04-11
 
 ### Added
