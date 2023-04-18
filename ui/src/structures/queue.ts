@@ -2,9 +2,9 @@ export interface QueueJob {
   run: () => void;
 }
 
-export interface QueueProps<T extends QueueJob> {
-  initialHighPriorityItems?: Map<number, T>;
-  initialLowPriorityItems?: Map<number, T>;
+export interface QueueProps<TQueueJob extends QueueJob> {
+  initialHighPriorityItems?: Map<number, TQueueJob>;
+  initialLowPriorityItems?: Map<number, TQueueJob>;
   startProcessing?: boolean;
   startOnInit?: boolean;
 }
@@ -185,24 +185,5 @@ export class Queue<T extends QueueJob> {
   defragment() {
     // TODO: implement
   }
+  // TODO: even better, implement a freedJobIds from which to pick for new elements in the queue
 }
-
-interface ExampleJob extends QueueJob {
-  helloWorld: string;
-}
-
-const queue = new Queue<ExampleJob>({ startProcessing: true });
-queue.enqueue({
-  helloWorld: "",
-  run() {
-    console.log("hello world!");
-  },
-});
-queue.priorityEnqueue({
-  helloWorld: "important!!",
-  run() {
-    console.log("HIGH PRIORITY!");
-  },
-});
-queue.start();
-queue.stop();
