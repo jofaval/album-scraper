@@ -1,5 +1,6 @@
 """Health checker"""
 
+import logging
 import os
 from typing import List
 
@@ -31,6 +32,16 @@ class HealthChecker():
 
         return False
 
+    def check_images_size(self, chapter_images: List[str]) -> bool:
+        """Checks that the images have an adequate size"""
+        corrupt_images = [
+            chapter_image
+            for chapter_image in chapter_images
+            if not os.path.exists(chapter_image) or os.path.getsize(chapter_image) <= 0
+        ]
+
+        return not corrupt_images
+
     def get_chapter_images(self, chapter_config: ChapterConfig) -> List[str]:
         """Gets all the images from the given chapter"""
         return []
@@ -38,6 +49,17 @@ class HealthChecker():
     def check_health_of_chapter(self, chapter_config: ChapterConfig) -> bool:
         """Check the health of the given chapter"""
         images = self.get_chapter_images(chapter_config)
-        return self.check_number_series(images)
+
+        if not self.check_number_series(images):
+            logging.warning("Chapter %s has an incomplete number of images")
+            # TODO: print anywhere else the number of missing images, or store it
+            return False
+
+        if not self.check_images_size(images):
+            logging.warning("Chapter %s has a corrupt images")
+            # TODO: print anywhere else the number of corrupt images, or store it
+            return False
+
+        return True
 
     # TODO: check for inconsistency in chapters: 0001, 0002, 0003, 0005

@@ -4,6 +4,16 @@ The log of changes on the project/repository.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 2023-04-23
+
+### Added
+
+- Base more ideas for the health checker
+
+### Modify
+
+- Health checker early returns
+
 ## 2023-04-16
 
 ### Added

@@ -14,6 +14,8 @@ from src.configs import album_config
 # TODO: implement a modular system with folders and configuration files
 # TODO: log to file with dates
 # TODO: implement a multilingual logging utility
+# TODO: implement avoid/ignore slug
+# TODO: write to (physical) log or simply store in memory, failed/corrupt chapters/images per chapter
 
 
 def start() -> None:

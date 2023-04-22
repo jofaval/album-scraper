@@ -20,6 +20,7 @@ class AlbumChaptersScraper(Scraper):
         """Get chapter links from the page content"""
         chapter_links_tags = content.select(self.config.chapter_link_query)
         if not chapter_links_tags:
+            logging.warning("No chapter links were found... sorry")
             return None
 
         chapter_links = []
