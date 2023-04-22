@@ -1,7 +1,7 @@
 """
 Main entrypoint for the project
 
-Inmediately scrapes the configured Album
+Immediately scrapes the configured Album
 """
 
 from src.webscrapper import start
