@@ -185,5 +185,5 @@ export class Queue<T extends QueueJob> {
   defragment() {
     // TODO: implement
   }
-  // TODO: even better, implement a freedJobIds from which to pick for new elements in the queue
+  // TODO: even better, implement a this.freedJobIds = [] from which to pick for new elements in the queue
 }
