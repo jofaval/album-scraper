@@ -17,18 +17,17 @@ class HealthChecker():
 
     def check_number_series(self, chapter_images: List[str]) -> bool:
         """Checks inconsistency in the number series and returns if there's inconsistency"""
+        invalid_images: List[str] = []
+
         for index, image in enumerate(chapter_images):
             image_basename: str = os.path.basename(image)
             image_index = image_basename.split(".")[0].split("-")[0]
-            actual_index = index - self.config.starting_health_check_image_index
+            actual_image_index = index + self.config.starting_health_check_image_index
 
-            try:
-                if int(image_index) != actual_index:
-                    return True
-            except SyntaxError:
-                return True
+            if not image_index.isnumeric() or int(image_index) != actual_image_index:
+                invalid_images.append(image)
 
-        return False
+        return not invalid_images
 
     def check_images_size(self, chapter_images: List[str]) -> bool:
         """Checks that the images have an adequate size"""
