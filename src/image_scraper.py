@@ -48,9 +48,6 @@ class ImageScraper():
 
     def get_image_path(self, meta_image_name: str, config: ImageConfig, img_format: str) -> str:
         """Generates the image's final path"""
-        chapter_index = str(config.chapter.index).zfill(
-            config.chapter.album.chapter_index_len
-        )
         image_index = str(config.index).zfill(
             config.chapter.album.image_index_len
         )
@@ -58,13 +55,7 @@ class ImageScraper():
         extension = self.get_image_extension(img_format)
         # return f'{chapter_index}-{config.chapter.name}/{image_index}-{meta_image_name}'
 
-        # TODO: move album and chapter path generation to an external, reusable class
-        return os.path.join(
-            config.chapter.album.download_dir,
-            config.chapter.album.slug,
-            f"{chapter_index}-{config.chapter.name}",
-            f"{image_index}.{extension}"
-        )
+        return os.path.join(config.chapter.generate_chapter_path(), f"{image_index}.{extension}")
 
     def get_image_content(self, config: ImageConfig) -> Union[Response, None]:
         """Downloads the image with retries"""

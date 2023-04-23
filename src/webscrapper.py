@@ -29,7 +29,7 @@ def start() -> None:
 
     try:
         album = Album(album_config)
-        album.scrape_chapters()
+        album.scrape()
     except Exception as error:
         logging.exception("error %s", error)
 

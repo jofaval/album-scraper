@@ -1,6 +1,7 @@
 """Chapter Config"""
 
 # from multiprocessing import Pool
+import os
 from typing import Callable, Union
 
 from bs4 import BeautifulSoup
@@ -23,3 +24,10 @@ class ChapterConfig(BaseModel):
     """Chapter's name"""
     url: str
     """Chapter's url"""
+    chapter_path: str = ""
+    """[Internal] chapter's download path, automatically generated"""
+
+    def generate_chapter_path(self) -> None:
+        """Generates the path for the chapter"""
+        chapter_index = str(self.index).zfill(self.album.chapter_index_len)
+        return os.path.join(self.album.album_path, f"{chapter_index}-{self.name}")

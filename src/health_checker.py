@@ -20,7 +20,6 @@ class HealthChecker():
         """Checks inconsistency in the number series and returns if there's inconsistency"""
         for index, image in enumerate(chapter_images):
             image_basename: str = os.path.basename(image)
-            # TODO: there may be different image names, such as 000-zdmhqcmir.jpg
             image_index = image_basename.split(".")[0].split("-")[0]
             # TODO: starting index may differ from album to album, it should be a configuration
 

@@ -1,11 +1,12 @@
 """Album"""
 
 import logging
+import os
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Pool
 from operator import attrgetter
 # from multiprocessing import Pool
-from typing import Generator, List, Tuple
+from typing import Generator, List, Tuple, Union
 
 from src.album_chapters_scraper import AlbumChaptersScraper
 from src.album_config import AlbumConfig
@@ -28,12 +29,27 @@ class Album():
         logging.getLogger("album").setLevel(config.logging_level)
         logging.getLogger("webscrapper").setLevel(config.logging_level)
 
-        logging.info("Initializing webscraper...")
+        logging.info("Initializing web scraper...")
 
         self.config = config
         self.album_chapters_scraper = AlbumChaptersScraper(config)
         self.chapter_scraper = ChapterScraper()
         self.image_scraper = ImageScraper()
+
+        list_of_paths = [self.config.download_dir]
+        if self.config.use_slug_on_download_path:
+            list_of_paths.append(self.config.slug)
+        self.config.album_path = os.path.join(*list_of_paths)
+
+    def reverse_chapters(self, chapters_links: List[str]) -> List[str]:
+        """Reverse a set list of chapters"""
+        return [
+            link
+            for _, link in sorted((
+                (self.config.get_chapter_index(link, index), link)
+                for index, link in enumerate(chapters_links)
+            ))
+        ]
 
     def get_chapters_links(self) -> List[str]:
         """Gets the links from all the chapters"""
@@ -45,15 +61,8 @@ class Album():
         chapters_links = list(set(chapters_links))
 
         if self.config.is_reverse_order:
-            # chapters_links = chapters_links[::-1]
             if self.config.get_chapter_index:
-                chapters_links = [
-                    link
-                    for index, link in sorted((
-                        (self.config.get_chapter_index(link, index), link)
-                        for index, link in enumerate(chapters_links)
-                    ))
-                ]
+                chapters_links = self.reverse_chapters(chapters_links)
             else:
                 chapters_links = chapters_links[::-1]
 
@@ -64,7 +73,8 @@ class Album():
         chapters_links: List[str],
     ) -> Generator[ChapterConfig, None, None]:
         """Generates the configuration for all the given chapters"""
-        return (
+        logging.info("Generating configuration for the chapters scraping...")
+        chapter_configs = (
             ChapterConfig(
                 url=chapter_link,
                 name=self.config.get_chapter_name(chapter_link),
@@ -76,6 +86,9 @@ class Album():
             )
             for index, chapter_link in enumerate(chapters_links)
         )
+        logging.info("Configuration for the chapters scraping generated!!")
+
+        return chapter_configs
 
     def scrape_chapter_images_thread(self, data: Tuple[ChapterConfig, List[ImageConfig]]) -> None:
         """Closure function to scrape images links and append them"""
@@ -92,8 +105,8 @@ class Album():
         logging.info('Chapter "%s" (%s) scraped successfully', name, url)
         return None
 
-    def scrape_chapters(self) -> None:
-        """Get the raw HTML chapter content"""
+    def scrape_chapters(self) -> Union[List[str], None]:
+        """Get the chapter's links"""
         logging.info("Starts scraping chapters, looking for links...")
 
         chapters_links = self.get_chapters_links()
@@ -103,12 +116,29 @@ class Album():
             return None
         logging.info("Chapters links were successfully retrieved")
 
-        chapters_links = chapters_links[self.config.chapter_start:self.config.chapter_end]
+        return chapters_links[self.config.chapter_start:self.config.chapter_end]
 
-        logging.info("Generating configuration for the chapters scraping...")
-        chapters_configs = self.generate_chapters_configs(chapters_links)
-        logging.info("Configuration for the chapters scraping generated!!")
+    def download_images(self, images_configs: List[ImageConfig]) -> None:
+        """Downloads the scraped images"""
+        logging.info('Polishing the configuration for the images scraper')
+        if images_configs and len(images_configs) > 1:
+            # Deletes local attributes so that it can be pickled (multiprocessing requirement)
+            dummy_album_config = images_configs[0].chapter.album
+            del dummy_album_config.get_chapter_index
+            del dummy_album_config.get_chapter_name
+            del dummy_album_config.get_link_from_tag
+            del dummy_album_config.get_source_from_tag
 
+        logging.info('Starting images scraper')
+        with Pool(processes=self.config.max_image_processes) as executor:
+            executor.map(self.image_scraper.scrape, images_configs)
+        logging.info('Images scraped successfully!!')
+
+    def scrape_images_from_chapter_links(
+        self,
+        chapters_configs: List[ChapterConfig]
+    ) -> List[ImageConfig]:
+        """Scrapes all the images links from every chapter"""
         images_configs: List[ImageConfig] = []
 
         logging.info("Starting to scrape the chapters, looking for images...")
@@ -125,19 +155,24 @@ class Album():
             return None
         logging.info('Chapters scraped successfully')
 
-        logging.info('Polishing the configuration for the images scraper')
-        if images_configs and len(images_configs) > 1:
-            # Deletes local attributes so that it can be pickled (multiprocessing requirement)
-            dummy_album_config = images_configs[0].chapter.album
-            del dummy_album_config.get_chapter_index
-            del dummy_album_config.get_chapter_name
-            del dummy_album_config.get_link_from_tag
-            del dummy_album_config.get_source_from_tag
+        return images_configs
 
-        logging.info('Starting images scraper')
-        with Pool(processes=self.config.max_image_processes) as executor:
-            executor.map(self.image_scraper.scrape, images_configs)
-        logging.info('Images scraped successfully!!')
+    def scrape(self) -> None:
+        """Album's orchestrator"""
+        chapters_links = self.scrape_chapters()
+        if not chapters_links:
+            logging.warning("No chapter links were retrieved, stopping...")
+            return
+
+        chapters_configs = self.generate_chapters_configs(chapters_links)
+
+        images_configs = self.scrape_images_from_chapter_links(
+            chapters_configs
+        )
+        if not images_configs:
+            logging.warning("No images could be configured, stopping...")
+            return
+
+        self.download_images(images_configs)
 
         logging.info('\nEverything went smoothly\n')
-        return None

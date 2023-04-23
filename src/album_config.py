@@ -25,6 +25,12 @@ class AlbumConfig(BaseModel):
     """Base url from which to scrape the chapters links"""
     logging_level: int = logging.INFO
     """Desired logging level"""
+    check_health: bool = True
+    """Wether it will check a correct health within the local files"""
+    use_slug_on_download_path: bool = False
+    """When generating the download path, will it use the slug"""
+    album_path: str = ""
+    """[Internal] album's download path, automatically generated"""
 
     # chapters
     chapter_end: int = 1_000_000_000
