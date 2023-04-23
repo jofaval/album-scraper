@@ -187,7 +187,7 @@ class Album():
         is_healthy = health_checker.check()
 
         if is_healthy:
-            logging.info("Album is healthy")
+            logging.warning("Album is healthy")
         else:
             logging.warning("Album is NOT healthy")
 

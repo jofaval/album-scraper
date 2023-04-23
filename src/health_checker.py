@@ -120,9 +120,10 @@ class HealthChecker():
             "%d unhealthy chapter(s) were detected",
             len(unhealthy_chapters)
         )
-        # TODO: use info logging
-        logging.warning(
-            '\n'.join((c.chapter_path for c in unhealthy_chapters))
-        )
+        if unhealthy_chapters:
+            # TODO: use info logging
+            logging.warning(
+                '\n'.join((c.chapter_path for c in unhealthy_chapters))
+            )
 
         return not unhealthy_chapters

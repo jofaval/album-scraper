@@ -18,6 +18,7 @@ from src.configs import album_config
 # TODO: write to (physical) log or simply store in memory, failed/corrupt chapters/images per chapter
 # TODO: implement a single chapter download mode, with human number input? even better, a flag for human number input
 # TODO: human number flag, wether an index starts at 0 or not (would start at 1)
+# TODO: fix after a health checker error detection, requires a granular image download
 
 
 def start() -> None:
