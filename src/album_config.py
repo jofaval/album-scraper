@@ -37,7 +37,7 @@ class AlbumConfig(BaseModel):
     """Base starting index for an image"""
     starting_url: str
     """Base url from which to scrape the chapters links"""
-    use_slug_on_download_path: bool = False
+    use_slug_on_download_path: bool = True
     """When generating the download path, will it use the slug"""
 
     # chapters

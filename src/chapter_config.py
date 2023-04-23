@@ -16,7 +16,7 @@ class ChapterConfig(BaseModel):
     """Album's configuration"""
     get_source_from_tag: Union[Callable[[BeautifulSoup], str], None]
     """Gets the source link, usually from an image tag"""
-    image_source_query: str
+    image_source_query: str = ""
     """CSS Query to retrieve all the images tags"""
     index: int
     """Chapter's index"""
@@ -29,5 +29,11 @@ class ChapterConfig(BaseModel):
 
     def generate_chapter_path(self) -> None:
         """Generates the path for the chapter"""
-        chapter_index = str(self.index).zfill(self.album.chapter_index_len)
-        return os.path.join(self.album.album_path, f"{chapter_index}-{self.name}")
+        if not self.chapter_path:
+            chapter_index = str(self.index).zfill(self.album.chapter_index_len)
+            self.chapter_path = os.path.join(
+                self.album.album_path,
+                f"{chapter_index}-{self.name}"
+            )
+
+        return self.chapter_path

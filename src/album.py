@@ -37,7 +37,7 @@ class Album():
         list_of_paths = [self.config.download_dir]
         if self.config.use_slug_on_download_path:
             list_of_paths.append(self.config.slug)
-        self.config.album_path = os.path.join(*list_of_paths)
+        self.config.album_path = os.path.realpath(os.path.join(*list_of_paths))
 
     def reverse_chapters(self, chapters_links: List[str]) -> List[str]:
         """Reverse a set list of chapters"""

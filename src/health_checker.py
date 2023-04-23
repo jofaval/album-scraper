@@ -2,6 +2,8 @@
 
 import logging
 import os
+from os import listdir
+from os.path import isfile, join
 from typing import Generator, List
 
 from src.album_config import AlbumConfig
@@ -15,21 +17,22 @@ class HealthChecker():
     def __init__(self, config: AlbumConfig) -> None:
         self.config = config
 
-    def check_number_series(self, chapter_images: List[str]) -> bool:
+    def check_number_series(self, chapter_images: List[str]) -> List[int]:
         """Checks inconsistency in the number series and returns if there's inconsistency"""
-        invalid_images: List[str] = []
+        invalid_images: List[int] = []
 
         for index, image in enumerate(chapter_images):
             image_basename: str = os.path.basename(image)
             image_index = image_basename.split(".")[0].split("-")[0]
-            actual_image_index = index + self.config.starting_health_check_image_index
+            actual_image_index = (index+len(invalid_images)) + \
+                self.config.starting_health_check_image_index
 
             if not image_index.isnumeric() or int(image_index) != actual_image_index:
-                invalid_images.append(image)
+                invalid_images.append(actual_image_index)
 
-        return not invalid_images
+        return invalid_images
 
-    def check_images_size(self, chapter_images: List[str]) -> bool:
+    def check_images_size(self, chapter_images: List[str]) -> List[str]:
         """Checks that the images have an adequate size"""
         corrupt_images = [
             chapter_image
@@ -37,49 +40,70 @@ class HealthChecker():
             if not os.path.exists(chapter_image) or os.path.getsize(chapter_image) <= 0
         ]
 
-        return not corrupt_images
+        return corrupt_images
 
     def get_chapter_images(self, chapter_config: ChapterConfig) -> List[str]:
         """Gets all the images from the given chapter"""
-        chapter_images: List[str] = []
-
-        raise NotImplementedError("get_chapter_folders not implemented")
-
-        return chapter_images
+        chapter_path = chapter_config.generate_chapter_path()
+        return [
+            join(chapter_path, image_file)
+            for image_file in listdir(chapter_path)
+            if isfile(join(chapter_path, image_file))
+        ]
 
     def check_health_of_chapter(self, chapter_config: ChapterConfig) -> bool:
         """Check the health of the given chapter"""
         images = self.get_chapter_images(chapter_config)
 
-        if not self.check_number_series(images):
-            logging.warning("Chapter %s has an incomplete number of images")
-            # TODO: print anywhere else the number of missing images, or store it
-            return False
+        # TODO: print anywhere else the number of missing images, or store it
+        corrupt_number_series = self.check_number_series(images)
+        if corrupt_number_series:
+            logging.warning(
+                "Chapter \"%s\" has an incomplete number of images, %d missing images",
+                chapter_config.chapter_path,
+                len(corrupt_number_series)
+            )
+            # TODO: use info logging
+            logging.warning(corrupt_number_series)
 
-        if not self.check_images_size(images):
-            logging.warning("Chapter %s has a corrupt images")
-            # TODO: print anywhere else the number of corrupt images, or store it
-            return False
+        # TODO: print anywhere else the number of corrupt images, or store it
+        corrupt_images = self.check_images_size(images)
+        if corrupt_images:
+            logging.warning(
+                "Chapter \"%s\" has %d corrupt images",
+                chapter_config.chapter_path,
+                len(corrupt_images)
+            )
+            # TODO: use info logging
+            logging.warning(corrupt_images)
 
-        return True
+        is_healthy = not corrupt_number_series and not corrupt_images
 
-    def get_chapters_folders(self) -> List[str]:
+        if not is_healthy:
+            logging.warning("\n")
+
+        return is_healthy
+
+    def get_chapters_folders(self) -> Generator[str, None, None]:
         """Retrieves all of the chapter folders (locally)"""
-        chapters_folders: List[str] = []
-
-        raise NotImplementedError("get_chapter_folders not implemented")
-
-        return chapters_folders
+        return (
+            join(self.config.album_path, chapter_folder)
+            for chapter_folder in listdir(self.config.album_path)
+        )
 
     def get_chapters_configs(self) -> Generator[ChapterConfig, None, None]:
         """Retrieves all of the chapter folders (locally)"""
-        chapters_folders: List[str] = self.get_chapters_folders()
-
-        raise NotImplementedError("get_chapters_configs not implemented")
+        chapters_folders = self.get_chapters_folders()
 
         return (
-            ChapterConfig()
-            for chapter_folder in chapters_folders
+            ChapterConfig(
+                album=self.config,
+                index=index,
+                name="",
+                url="",
+                chapter_path=chapter_folder
+            )
+            for index, chapter_folder in enumerate(chapters_folders)
         )
 
     def check(self) -> bool:
@@ -91,5 +115,14 @@ class HealthChecker():
             is_chapter_healthy = self.check_health_of_chapter(chapter_config)
             if not is_chapter_healthy:
                 unhealthy_chapters.append(chapter_config)
+
+        logging.warning(
+            "%d unhealthy chapter(s) were detected",
+            len(unhealthy_chapters)
+        )
+        # TODO: use info logging
+        logging.warning(
+            '\n'.join((c.chapter_path for c in unhealthy_chapters))
+        )
 
         return not unhealthy_chapters
