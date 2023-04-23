@@ -2,13 +2,12 @@
 
 import logging
 import os
-from typing import List
+from typing import Generator, List
 
 from src.album_config import AlbumConfig
 from src.chapter_config import ChapterConfig
 
 
-# TODO: instantiate as a configuration inside the album?
 class HealthChecker():
     """Checks the health of a given album"""
     config: AlbumConfig
@@ -21,10 +20,10 @@ class HealthChecker():
         for index, image in enumerate(chapter_images):
             image_basename: str = os.path.basename(image)
             image_index = image_basename.split(".")[0].split("-")[0]
-            # TODO: starting index may differ from album to album, it should be a configuration
+            actual_index = index - self.config.starting_health_check_image_index
 
             try:
-                if int(image_index) != index:
+                if int(image_index) != actual_index:
                     return True
             except SyntaxError:
                 return True
@@ -43,7 +42,11 @@ class HealthChecker():
 
     def get_chapter_images(self, chapter_config: ChapterConfig) -> List[str]:
         """Gets all the images from the given chapter"""
-        return []
+        chapter_images: List[str] = []
+
+        raise NotImplementedError("get_chapter_folders not implemented")
+
+        return chapter_images
 
     def check_health_of_chapter(self, chapter_config: ChapterConfig) -> bool:
         """Check the health of the given chapter"""
@@ -61,8 +64,33 @@ class HealthChecker():
 
         return True
 
+    def get_chapters_folders(self) -> List[str]:
+        """Retrieves all of the chapter folders (locally)"""
+        chapters_folders: List[str] = []
+
+        raise NotImplementedError("get_chapter_folders not implemented")
+
+        return chapters_folders
+
+    def get_chapters_configs(self) -> Generator[ChapterConfig, None, None]:
+        """Retrieves all of the chapter folders (locally)"""
+        chapters_folders: List[str] = self.get_chapters_folders()
+
+        raise NotImplementedError("get_chapters_configs not implemented")
+
+        return (
+            ChapterConfig()
+            for chapter_folder in chapters_folders
+        )
+
     def check(self) -> bool:
         """Checks the health of the given album"""
-        return True
+        chapters_configs = self.get_chapters_configs()
+        unhealthy_chapters: List[ChapterConfig] = []
 
-    # TODO: check for inconsistency in chapters: 0001, 0002, 0003, 0005
+        for chapter_config in chapters_configs:
+            is_chapter_healthy = self.check_health_of_chapter(chapter_config)
+            if not is_chapter_healthy:
+                unhealthy_chapters.append(chapter_config)
+
+        return not unhealthy_chapters

@@ -8,11 +8,11 @@ from operator import attrgetter
 # from multiprocessing import Pool
 from typing import Generator, List, Tuple, Union
 
-from health_checker import HealthChecker
 from src.album_chapters_scraper import AlbumChaptersScraper
 from src.album_config import AlbumConfig
 from src.chapter_config import ChapterConfig
 from src.chapter_scraper import ChapterScraper
+from src.health_checker import HealthChecker
 from src.image_config import ImageConfig
 from src.image_scraper import ImageScraper
 
