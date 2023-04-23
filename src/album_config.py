@@ -21,7 +21,7 @@ class AlbumConfig(BaseModel):
     """Will it check for non-downloaded chapters?"""
     download_dir: str = os.path.dirname(__file__)
     """The directory to download the album in, if it doesn't exist, it will create it"""
-    download_updates: bool = True
+    should_download_updates: bool = True
     """Will it download those non-downloaded chapters?"""
     get_link_from_tag: Union[Callable[[Tag], None], None]
     """Extracts the link from the chapter tag"""

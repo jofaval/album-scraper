@@ -157,16 +157,21 @@ class Album():
 
         return images_configs
 
-    def scrape(self) -> None:
-        """Album's scrape orchestrator"""
+    def prepare_scraper(self) -> None:
+        """Prepares all the necessary steps to scrape"""
         self.album_chapters_scraper = AlbumChaptersScraper(self.config)
         self.chapter_scraper = ChapterScraper()
         self.image_scraper = ImageScraper()
 
-        chapters_links = self.scrape_chapters()
+    def scrape(self, chapters_links: List[str] = None) -> None:
+        """Album's scrape orchestrator"""
+        self.prepare_scraper()
+
         if not chapters_links:
-            logging.warning("No chapter links were retrieved, stopping...")
-            return
+            chapters_links = self.scrape_chapters()
+            if not chapters_links:
+                logging.warning("No chapter links were retrieved, stopping...")
+                return
 
         chapters_configs = self.generate_chapters_configs(chapters_links)
 
@@ -183,6 +188,8 @@ class Album():
 
     def check_health(self) -> None:
         """Checks the album's health"""
+        logging.warning("Checking chapter health...")
+
         health_checker = HealthChecker(self.config)
         is_healthy = health_checker.check()
 
@@ -193,15 +200,39 @@ class Album():
 
     def download_updates(self, updates: List[str]) -> None:
         """Downloads the given updates, overriding locally if necessary"""
-        raise NotImplementedError("download_updates not implemented")
+        logging.warning("Downloading updates...")
+        return self.scrape(chapters_links=updates)
 
     def detect_updates(self) -> None:
         """Detect updates, and conditionally download them"""
+        self.prepare_scraper()
+
+        local_chapters = [
+            "-".join(chapter_folder.split("-")[1:])
+            for chapter_folder in os.listdir(self.config.album_path)
+        ]
+
+        chapters_links = self.scrape_chapters()
         updates: List[str] = []
+        for chapter_link in chapters_links:
+            chapter_name = self.config.get_chapter_name(chapter_link)
 
-        raise NotImplementedError("detect_updates not implemented")
+            if chapter_name not in local_chapters:
+                updates.append(chapter_link)
 
-        if self.config.download_updates:
+        if not updates:
+            logging.warning("No updates were found")
+            return
+
+        total_updates = len(updates)
+        logging.warning(
+            "%d chapter updates were detected"
+            if total_updates != 1 else "%d chapter update was detected",
+            total_updates
+        )
+        logging.warning('\n'.join(updates))
+
+        if self.config.should_download_updates:
             self.download_updates(updates)
 
     def start(self) -> None:
