@@ -11,26 +11,32 @@ from pydantic import BaseModel
 class AlbumConfig(BaseModel):
     """All the necessary configuration for an album"""
     # album
+    album_path: str = ""
+    """[Internal] album's download path, automatically generated"""
     chapter_link_query: str
     """CSS query to get the chapters links"""
+    should_check_health: bool = True
+    """Wether it will check a correct health within the local files"""
+    should_detect_updates: bool = True
+    """Will it check for non-downloaded chapters?"""
     download_dir: str = os.path.dirname(__file__)
     """The directory to download the album in, if it doesn't exist, it will create it"""
+    download_updates: bool = True
+    """Will it download those non-downloaded chapters?"""
     get_link_from_tag: Union[Callable[[Tag], None], None]
     """Extracts the link from the chapter tag"""
     is_reverse_order: bool = True
     """Does it show first the latest chapters? If so, it's in reverse order"""
+    logging_level: int = logging.INFO
+    """Desired logging level"""
+    should_scrape: bool = True
+    """Wether it will attempt to scrape or not"""
     slug: str
     """Filepath slug for the album"""
     starting_url: str
     """Base url from which to scrape the chapters links"""
-    logging_level: int = logging.INFO
-    """Desired logging level"""
-    check_health: bool = True
-    """Wether it will check a correct health within the local files"""
     use_slug_on_download_path: bool = False
     """When generating the download path, will it use the slug"""
-    album_path: str = ""
-    """[Internal] album's download path, automatically generated"""
 
     # chapters
     chapter_end: int = 1_000_000_000

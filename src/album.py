@@ -8,6 +8,7 @@ from operator import attrgetter
 # from multiprocessing import Pool
 from typing import Generator, List, Tuple, Union
 
+from health_checker import HealthChecker
 from src.album_chapters_scraper import AlbumChaptersScraper
 from src.album_config import AlbumConfig
 from src.chapter_config import ChapterConfig
@@ -32,9 +33,6 @@ class Album():
         logging.info("Initializing web scraper...")
 
         self.config = config
-        self.album_chapters_scraper = AlbumChaptersScraper(config)
-        self.chapter_scraper = ChapterScraper()
-        self.image_scraper = ImageScraper()
 
         list_of_paths = [self.config.download_dir]
         if self.config.use_slug_on_download_path:
@@ -60,11 +58,13 @@ class Album():
 
         chapters_links = list(set(chapters_links))
 
-        if self.config.is_reverse_order:
-            if self.config.get_chapter_index:
-                chapters_links = self.reverse_chapters(chapters_links)
-            else:
-                chapters_links = chapters_links[::-1]
+        if not self.config.is_reverse_order:
+            return chapters_links
+
+        if self.config.get_chapter_index:
+            chapters_links = self.reverse_chapters(chapters_links)
+        else:
+            chapters_links = chapters_links[::-1]
 
         return chapters_links
 
@@ -158,7 +158,11 @@ class Album():
         return images_configs
 
     def scrape(self) -> None:
-        """Album's orchestrator"""
+        """Album's scrape orchestrator"""
+        self.album_chapters_scraper = AlbumChaptersScraper(self.config)
+        self.chapter_scraper = ChapterScraper()
+        self.image_scraper = ImageScraper()
+
         chapters_links = self.scrape_chapters()
         if not chapters_links:
             logging.warning("No chapter links were retrieved, stopping...")
@@ -176,3 +180,37 @@ class Album():
         self.download_images(images_configs)
 
         logging.info('\nEverything went smoothly\n')
+
+    def check_health(self) -> None:
+        """Checks the album's health"""
+        health_checker = HealthChecker(self.config)
+        is_healthy = health_checker.check()
+
+        if is_healthy:
+            logging.info("Album is healthy")
+        else:
+            logging.warning("Album is NOT healthy")
+
+    def download_updates(self, updates: List[str]) -> None:
+        """Downloads the given updates, overriding locally if necessary"""
+        raise NotImplementedError("download_updates not implemented")
+
+    def detect_updates(self) -> None:
+        """Detect updates, and conditionally download them"""
+        updates: List[str] = []
+
+        raise NotImplementedError("detect_updates not implemented")
+
+        if self.config.download_updates:
+            self.download_updates(updates)
+
+    def start(self) -> None:
+        """Album's orchestrator"""
+        if self.config.should_scrape:
+            self.scrape()
+
+        if self.config.should_detect_updates:
+            self.detect_updates()
+
+        if self.config.should_check_health:
+            self.check_health()

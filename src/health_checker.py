@@ -61,4 +61,8 @@ class HealthChecker():
 
         return True
 
+    def check(self) -> bool:
+        """Checks the health of the given album"""
+        return True
+
     # TODO: check for inconsistency in chapters: 0001, 0002, 0003, 0005
