@@ -23,6 +23,7 @@ class Album():
     album_chapters_scraper: AlbumChaptersScraper
     chapter_scraper: ChapterScraper
     image_scraper: ImageScraper
+    chapters_links: List[str] = None
 
     def __init__(self, config: AlbumConfig) -> None:
         assert config.chapter_end > config.chapter_start
@@ -107,6 +108,9 @@ class Album():
 
     def scrape_chapters(self) -> Union[List[str], None]:
         """Get the chapter's links"""
+        if self.chapters_links:
+            return self.chapters_links
+
         logging.info("Starts scraping chapters, looking for links...")
 
         chapters_links = self.get_chapters_links()
@@ -116,7 +120,9 @@ class Album():
             return None
         logging.info("Chapters links were successfully retrieved")
 
-        return chapters_links[self.config.chapter_start:self.config.chapter_end]
+        chapters_links = chapters_links[self.config.chapter_start:self.config.chapter_end]
+        self.chapters_links = chapters_links
+        return chapters_links
 
     def download_images(self, images_configs: List[ImageConfig]) -> None:
         """Downloads the scraped images"""
@@ -185,6 +191,13 @@ class Album():
                 logging.warning("No chapter links were retrieved, stopping...")
                 return
 
+        if self.config.chapter_indices:
+            chapters_links = [
+                chapters_links[index]
+                for index in self.config.chapter_indices
+            ]
+        logging.warning("%d chapter(s) was/were detected", len(chapters_links))
+
         chapters_configs = self.generate_chapters_configs(chapters_links)
 
         images_configs = self.scrape_images_from_chapter_links(
@@ -193,6 +206,7 @@ class Album():
         if not images_configs:
             logging.warning("No images could be configured, stopping...")
             return
+        logging.warning("%d image(s) was/were detected", len(images_configs))
 
         self.download_images(images_configs)
 

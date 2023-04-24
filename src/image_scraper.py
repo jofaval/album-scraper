@@ -75,7 +75,16 @@ class ImageScraper():
                         "%s failed download, might retry",
                         config.url
                     )
-                    raise Exception("%s failed download, might retry")
+                    raise Exception(
+                        "%s failed download, might retry",
+                        config.url
+                    )
+
+                if not response.content:
+                    raise Exception(
+                        "No content was detected for %s",
+                        config.url
+                    )
 
                 return response
             except Exception as error:

@@ -2,7 +2,7 @@
 
 import logging
 import os
-from typing import Callable, Union
+from typing import Callable, List, Union
 
 from bs4 import BeautifulSoup, Tag
 from pydantic import BaseModel
@@ -41,6 +41,8 @@ class AlbumConfig(BaseModel):
     """Base url from which to scrape the chapters links"""
     use_slug_on_download_path: bool = True
     """When generating the download path, will it use the slug"""
+    chapter_indices: List[int] = []
+    """Manual chapter indices to scrape"""
 
     # chapters
     chapter_end: int = 1_000_000_000

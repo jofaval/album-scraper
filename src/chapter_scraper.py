@@ -1,6 +1,7 @@
 """Chapter Scraper"""
 
 # from multiprocessing import Pool
+import logging
 from typing import List, Union
 
 from bs4 import BeautifulSoup
@@ -41,6 +42,8 @@ class ChapterScraper(Scraper):
 
     def scrape(self, config: ChapterConfig) -> Union[List[ImageConfig], None]:
         """Gets all the image's links"""
+        logging.warning('Scraping chapter "%s"...', config.url)
+
         content = self.scrape_url(
             config.url,
             config.album.should_retry_chapters,

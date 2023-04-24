@@ -4,10 +4,19 @@ import logging
 import os
 from os import listdir
 from os.path import isfile, join
-from typing import Generator, List
+from typing import Any, Generator, List
 
 from src.album_config import AlbumConfig
 from src.chapter_config import ChapterConfig
+
+
+def log_health_details_list(label: str, details: List[Any]) -> None:
+    """Custom logging formatter for the Health checker"""
+    logging.warning(
+        "%s:\n%s",
+        label,
+        '\n'.join((str(detail) for detail in details))
+    )
 
 
 class HealthChecker():
@@ -65,6 +74,7 @@ class HealthChecker():
             )
             # TODO: use info logging
             logging.warning(corrupt_number_series)
+            log_health_details_list("Missing images", corrupt_number_series)
 
         # TODO: print anywhere else the number of corrupt images, or store it
         corrupt_images = self.check_images_size(images)
@@ -75,7 +85,7 @@ class HealthChecker():
                 len(corrupt_images)
             )
             # TODO: use info logging
-            logging.warning(corrupt_images)
+            log_health_details_list("Corrupt images", corrupt_images)
 
         is_healthy = not corrupt_number_series and not corrupt_images
 
@@ -111,6 +121,7 @@ class HealthChecker():
         chapters_configs = self.get_chapters_configs()
 
         unhealthy_chapters: List[ChapterConfig] = []
+        # TODO: convert to set and check for non-repeated missing series, more error proof
         missing_chapters: List[int] = []
 
         for index, chapter_config in enumerate(chapters_configs):
@@ -133,10 +144,9 @@ class HealthChecker():
         )
         if unhealthy_chapters:
             # TODO: use info logging
-            logging.warning(
-                '\n'.join(
-                    (chapter_config.chapter_path for chapter_config in unhealthy_chapters)
-                )
+            log_health_details_list(
+                "Unhealthy chapters",
+                (chapter.chapter_path for chapter in unhealthy_chapters)
             )
             return False
 
@@ -146,9 +156,6 @@ class HealthChecker():
         )
         if missing_chapters:
             # TODO: use info logging
-            logging.warning(
-                '\n'.join((str(chapter_index)
-                          for chapter_index in missing_chapters))
-            )
+            log_health_details_list("Missing chapters", missing_chapters)
 
         return not unhealthy_chapters
