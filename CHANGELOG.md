@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Finish base implementation for the health checker
 - Implement updates detection and download
 
+### Modified
+
+- Improved chapter and image missing detection
+- Refactors
+
 ### Fixed
 
 - Early image response content consumption, no content was available to copy into a file

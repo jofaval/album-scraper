@@ -28,18 +28,23 @@ class HealthChecker():
 
     def check_number_series(self, chapter_images: List[str]) -> List[int]:
         """Checks inconsistency in the number series and returns if there's inconsistency"""
-        invalid_images: List[int] = []
+        set_of_images_indices = set((
+            int(os.path.basename(chapter_image).split(".")[0].split("-")[0])
+            for chapter_image in chapter_images
+            if os.path.basename(chapter_image).split(".")[0].split("-")[0].isnumeric()
+        ))
+        list_of_images_indices = list(set_of_images_indices)
 
-        for index, image in enumerate(chapter_images):
-            image_basename: str = os.path.basename(image)
-            image_index = image_basename.split(".")[0].split("-")[0]
-            actual_image_index = (index+len(invalid_images)) + \
-                self.config.starting_health_check_image_index
+        actual_range_of_images = set(range(
+            self.config.starting_health_check_image_index,
+            list_of_images_indices[-1] + 1
+        ))
 
-            if not image_index.isnumeric() or int(image_index) != actual_image_index:
-                invalid_images.append(actual_image_index)
+        missing_images = list(
+            set_of_images_indices.difference(set(actual_range_of_images))
+        )
 
-        return invalid_images
+        return missing_images
 
     def check_images_size(self, chapter_images: List[str]) -> List[str]:
         """Checks that the images have an adequate size"""
