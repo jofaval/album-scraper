@@ -100,7 +100,7 @@ class HealthChecker():
             for chapter_folder in listdir(self.config.album_path)
         )
 
-    def get_chapters_configs(self) -> Generator[ChapterConfig, None, None]:
+    def get_chapters_configs(self) -> List[ChapterConfig]:
         """Retrieves all of the chapter folders (locally)"""
         chapters_folders = self.get_chapters_folders()
 
@@ -115,32 +115,31 @@ class HealthChecker():
             for index, chapter_folder in enumerate(chapters_folders)
         )
 
+    def check_missing_chapters(self) -> List[int]:
+        """Returns the missing chapters of the album"""
+        set_of_chapter_indices = set((
+            int(os.path.basename(chapter_config.chapter_path).split("-")[0])
+            for chapter_config in self.get_chapters_configs()
+        ))
+        list_of_chapter_indices = list(set_of_chapter_indices)
+
+        actual_range_of_chapters = set(range(
+            self.config.starting_health_check_chapter_index,
+            list_of_chapter_indices[-1] + 1
+        ))
+
+        missing_chapters: List[int] = list(
+            set_of_chapter_indices.difference(set(actual_range_of_chapters))
+        )
+        return missing_chapters
+
     def check(self) -> bool:
         """Checks the health of the given album"""
-        chapters_configs = self.get_chapters_configs()
-
-        unhealthy_chapters: List[ChapterConfig] = []
-
-        for chapter_config in chapters_configs:
-            is_chapter_healthy = self.check_health_of_chapter(chapter_config)
-            if not is_chapter_healthy:
-                unhealthy_chapters.append(chapter_config)
-
-        # TODO: check by range, missing indices will be computed
-        missing_chapters: List[int] = []
-
-        set_of_chapter_indices = list(set((
-            int(
-                os.path.basename(chapter_config.chapter_path).split("-")[0]
-            ) + self.config.starting_health_check_chapter_index
-            for chapter_config in chapters_configs
-        )))
-
-        for index, chapter_index in enumerate(set_of_chapter_indices):
-            preadjusted_index = len(missing_chapters) + index
-            actual_index = preadjusted_index + self.config.starting_health_check_chapter_index
-            if actual_index != chapter_index:
-                missing_chapters.append(actual_index)
+        unhealthy_chapters = [
+            chapter_config
+            for chapter_config in self.get_chapters_configs()
+            if not self.check_health_of_chapter(chapter_config)
+        ]
 
         logging.warning(
             "%d unhealthy chapter(s) were detected",
@@ -152,6 +151,8 @@ class HealthChecker():
                 (chapter.chapter_path for chapter in unhealthy_chapters)
             )
             return False
+
+        missing_chapters = self.check_missing_chapters()
 
         logging.warning(
             "%d missing chapter(s) were detected",
