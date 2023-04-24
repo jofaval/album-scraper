@@ -84,7 +84,6 @@ class HealthChecker():
                 chapter_config.chapter_path,
                 len(corrupt_images)
             )
-            # TODO: use info logging
             log_health_details_list("Corrupt images", corrupt_images)
 
         is_healthy = not corrupt_number_series and not corrupt_images
@@ -121,29 +120,33 @@ class HealthChecker():
         chapters_configs = self.get_chapters_configs()
 
         unhealthy_chapters: List[ChapterConfig] = []
-        # TODO: convert to set and check for non-repeated missing series, more error proof
-        missing_chapters: List[int] = []
 
-        for index, chapter_config in enumerate(chapters_configs):
-            chapter_basename: str = os.path.basename(
-                chapter_config.chapter_path
-            )
-            chapter_index = int(chapter_basename.split(
-                "-")[0]) + self.config.starting_health_check_chapter_index
-
-            if len(missing_chapters) + index + self.config.starting_health_check_chapter_index != chapter_index:
-                missing_chapters.append(len(missing_chapters) + index)
-
+        for chapter_config in chapters_configs:
             is_chapter_healthy = self.check_health_of_chapter(chapter_config)
             if not is_chapter_healthy:
                 unhealthy_chapters.append(chapter_config)
+
+        # TODO: check by range, missing indices will be computed
+        missing_chapters: List[int] = []
+
+        set_of_chapter_indices = list(set((
+            int(
+                os.path.basename(chapter_config.chapter_path).split("-")[0]
+            ) + self.config.starting_health_check_chapter_index
+            for chapter_config in chapters_configs
+        )))
+
+        for index, chapter_index in enumerate(set_of_chapter_indices):
+            preadjusted_index = len(missing_chapters) + index
+            actual_index = preadjusted_index + self.config.starting_health_check_chapter_index
+            if actual_index != chapter_index:
+                missing_chapters.append(actual_index)
 
         logging.warning(
             "%d unhealthy chapter(s) were detected",
             len(unhealthy_chapters)
         )
         if unhealthy_chapters:
-            # TODO: use info logging
             log_health_details_list(
                 "Unhealthy chapters",
                 (chapter.chapter_path for chapter in unhealthy_chapters)
@@ -155,7 +158,6 @@ class HealthChecker():
             len(missing_chapters)
         )
         if missing_chapters:
-            # TODO: use info logging
             log_health_details_list("Missing chapters", missing_chapters)
 
         return not unhealthy_chapters and not missing_chapters
