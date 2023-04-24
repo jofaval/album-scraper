@@ -28,33 +28,35 @@ class HealthChecker():
 
     def get_missing_images(self, chapter_images: List[str]) -> List[int]:
         """Checks inconsistency in the number series and returns if there's inconsistency"""
-        set_of_images_indices = set((
-            int(os.path.basename(chapter_image).split(".")[0].split("-")[0])
-            for chapter_image in chapter_images
-            if os.path.basename(chapter_image).split(".")[0].split("-")[0].isnumeric()
-        ))
+        raw_images_indices = map(
+            lambda x: os.path.basename(x).split(".")[0].split("-")[0],
+            chapter_images
+        )
+        only_numeric_images_indices = filter(
+            lambda chapter_raw_index: chapter_raw_index.isnumeric(),
+            raw_images_indices
+        )
+        set_of_images_indices = set(map(int, only_numeric_images_indices))
         list_of_images_indices = list(set_of_images_indices)
 
         actual_range_of_images = set(range(
             self.config.starting_health_check_image_index,
             list_of_images_indices[-1] + 1
         ))
+        del list_of_images_indices
 
         missing_images = list(
-            set_of_images_indices.difference(set(actual_range_of_images))
+            set_of_images_indices.difference(actual_range_of_images)
         )
 
         return missing_images
 
     def get_corrupt_image_sizes(self, chapter_images: List[str]) -> List[str]:
         """Checks that the images have an adequate size"""
-        corrupt_images = [
-            chapter_image
-            for chapter_image in chapter_images
-            if not os.path.exists(chapter_image) or os.path.getsize(chapter_image) <= 0
-        ]
-
-        return corrupt_images
+        return list(filter(
+            lambda chapter_image: os.path.getsize(chapter_image) <= 0,
+            chapter_images
+        ))
 
     def get_chapter_images(self, chapter_config: ChapterConfig) -> List[str]:
         """Gets all the images from the given chapter"""
@@ -132,9 +134,10 @@ class HealthChecker():
             self.config.starting_health_check_chapter_index,
             list_of_chapter_indices[-1] + 1
         ))
+        del list_of_chapter_indices
 
         missing_chapters = list(
-            set_of_chapter_indices.difference(set(actual_range_of_chapters))
+            set_of_chapter_indices.difference(actual_range_of_chapters)
         )
         return missing_chapters
 
