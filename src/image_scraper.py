@@ -80,7 +80,7 @@ class ImageScraper():
                         config.url
                     )
 
-                if not response.content:
+                if not response.headers['Content-Length']:
                     raise Exception(
                         "No content was detected for %s",
                         config.url
@@ -96,7 +96,7 @@ class ImageScraper():
 
     def scrape(self, config: ImageConfig) -> None:
         """Scrapes an image and writes it with metadata"""
-        logging.info("Start scraper for image: %s", config.url)
+        logging.warning("Start scraper for image: %s", config.url)
         response = self.get_image_content(config)
         if not response or not response.ok:
             logging.warning("%s could not be downloaded", config.url)
@@ -121,5 +121,5 @@ class ImageScraper():
             )
             return None
 
-        logging.info("Image saved %s %s!!", image_path, config.url)
+        logging.warning("Image saved %s %s!!", image_path, config.url)
         return None

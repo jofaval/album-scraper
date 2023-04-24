@@ -47,7 +47,7 @@ class AlbumConfig(BaseModel):
     # chapters
     chapter_end: int = 1_000_000_000
     """Last chapter to scrape, it should be the desired end chapter"""
-    chapter_index_len: int = 4
+    chapter_index_len: int = 3
     """Length of the index in the filepath, e.g. 4 would be 0000-chapter-name"""
     chapter_start: int = 0
     """Start chapter to scrape"""

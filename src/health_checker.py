@@ -12,7 +12,7 @@ from src.chapter_config import ChapterConfig
 
 def log_health_details_list(label: str, details: List[Any]) -> None:
     """Custom logging formatter for the Health checker"""
-    logging.warning(
+    logging.info(
         "%s:\n%s",
         label,
         '\n'.join((str(detail) for detail in details))
@@ -129,9 +129,9 @@ class HealthChecker():
                 chapter_config.chapter_path
             )
             chapter_index = int(chapter_basename.split(
-                "-")[0]) + self.config.starting_health_check_image_index
+                "-")[0]) + self.config.starting_health_check_chapter_index
 
-            if len(missing_chapters) + index != chapter_index:
+            if len(missing_chapters) + index + self.config.starting_health_check_chapter_index != chapter_index:
                 missing_chapters.append(len(missing_chapters) + index)
 
             is_chapter_healthy = self.check_health_of_chapter(chapter_config)
@@ -158,4 +158,4 @@ class HealthChecker():
             # TODO: use info logging
             log_health_details_list("Missing chapters", missing_chapters)
 
-        return not unhealthy_chapters
+        return not unhealthy_chapters and not missing_chapters

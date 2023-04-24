@@ -19,7 +19,8 @@ from src.configs import album_config
 # TODO: implement a single chapter download mode, with human number input? even better, a flag for human number input
 # TODO: human number flag, wether an index starts at 0 or not (would start at 1)
 # TODO: fix after a health checker error detection, requires a granular image download
-# TODO: download list of chapter indices
+# TODO: implement a manual image download per chapters?
+# TODO: implement c-sharp solution at the root, in another source file, maybe called c-sharp, for maximum multithreading and resources profit
 
 
 def start() -> None:
