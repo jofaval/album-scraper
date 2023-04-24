@@ -19,6 +19,7 @@ from src.configs import album_config
 # TODO: implement a single chapter download mode, with human number input? even better, a flag for human number input
 # TODO: human number flag, wether an index starts at 0 or not (would start at 1)
 # TODO: fix after a health checker error detection, requires a granular image download
+# TODO: download list of chapter indices
 
 
 def start() -> None:
@@ -37,5 +38,5 @@ def start() -> None:
 
 if __name__ == "__main__":
     raise UserWarning(
-        "Incorrect usage: please, execute at the root of the project"
+        "Incorrect usage: please, execute at the root of the project, `python .`"
     )
