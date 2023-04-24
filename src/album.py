@@ -217,7 +217,7 @@ class Album():
         logging.warning("Checking chapter health...")
 
         health_checker = HealthChecker(self.config)
-        is_healthy = health_checker.check()
+        is_healthy = health_checker.is_album_healthy()
 
         if is_healthy:
             logging.warning("Album is healthy")

@@ -26,7 +26,7 @@ class HealthChecker():
     def __init__(self, config: AlbumConfig) -> None:
         self.config = config
 
-    def check_number_series(self, chapter_images: List[str]) -> List[int]:
+    def get_missing_images(self, chapter_images: List[str]) -> List[int]:
         """Checks inconsistency in the number series and returns if there's inconsistency"""
         set_of_images_indices = set((
             int(os.path.basename(chapter_image).split(".")[0].split("-")[0])
@@ -46,7 +46,7 @@ class HealthChecker():
 
         return missing_images
 
-    def check_images_size(self, chapter_images: List[str]) -> List[str]:
+    def get_corrupt_image_sizes(self, chapter_images: List[str]) -> List[str]:
         """Checks that the images have an adequate size"""
         corrupt_images = [
             chapter_image
@@ -65,12 +65,12 @@ class HealthChecker():
             if isfile(join(chapter_path, image_file))
         ]
 
-    def check_health_of_chapter(self, chapter_config: ChapterConfig) -> bool:
+    def is_chapter_healthy(self, chapter_config: ChapterConfig) -> bool:
         """Check the health of the given chapter"""
         images = self.get_chapter_images(chapter_config)
 
         # TODO: print anywhere else the number of missing images, or store it
-        corrupt_number_series = self.check_number_series(images)
+        corrupt_number_series = self.get_missing_images(images)
         if corrupt_number_series:
             logging.warning(
                 "Chapter \"%s\" has an incomplete number of images, %d missing images",
@@ -82,7 +82,7 @@ class HealthChecker():
             log_health_details_list("Missing images", corrupt_number_series)
 
         # TODO: print anywhere else the number of corrupt images, or store it
-        corrupt_images = self.check_images_size(images)
+        corrupt_images = self.get_corrupt_image_sizes(images)
         if corrupt_images:
             logging.warning(
                 "Chapter \"%s\" has %d corrupt images",
@@ -120,7 +120,7 @@ class HealthChecker():
             for index, chapter_folder in enumerate(chapters_folders)
         )
 
-    def check_missing_chapters(self) -> List[int]:
+    def get_missing_chapters(self) -> List[int]:
         """Returns the missing chapters of the album"""
         set_of_chapter_indices = set((
             int(os.path.basename(chapter_config.chapter_path).split("-")[0])
@@ -133,17 +133,17 @@ class HealthChecker():
             list_of_chapter_indices[-1] + 1
         ))
 
-        missing_chapters: List[int] = list(
+        missing_chapters = list(
             set_of_chapter_indices.difference(set(actual_range_of_chapters))
         )
         return missing_chapters
 
-    def check(self) -> bool:
-        """Checks the health of the given album"""
+    def are_there_unhealthy_chapters(self) -> List[ChapterConfig]:
+        """Get all of the unhealthy chapters"""
         unhealthy_chapters = [
             chapter_config
             for chapter_config in self.get_chapters_configs()
-            if not self.check_health_of_chapter(chapter_config)
+            if not self.is_chapter_healthy(chapter_config)
         ]
 
         logging.warning(
@@ -155,9 +155,12 @@ class HealthChecker():
                 "Unhealthy chapters",
                 (chapter.chapter_path for chapter in unhealthy_chapters)
             )
-            return False
 
-        missing_chapters = self.check_missing_chapters()
+        return bool(unhealthy_chapters)
+
+    def are_there_missing_chapters(self) -> List[int]:
+        """Check if there are any missing chapters"""
+        missing_chapters = self.get_missing_chapters()
 
         logging.warning(
             "%d missing chapter(s) were detected",
@@ -166,4 +169,11 @@ class HealthChecker():
         if missing_chapters:
             log_health_details_list("Missing chapters", missing_chapters)
 
-        return not unhealthy_chapters and not missing_chapters
+        return bool(missing_chapters)
+
+    def is_album_healthy(self) -> bool:
+        """Checks the health of the given album"""
+        missing_chapters = self.are_there_missing_chapters()
+        unhealthy_chapters = self.are_there_unhealthy_chapters()
+
+        return not missing_chapters and not unhealthy_chapters
