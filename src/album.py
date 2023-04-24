@@ -121,6 +121,13 @@ class Album():
     def download_images(self, images_configs: List[ImageConfig]) -> None:
         """Downloads the scraped images"""
         logging.info('Polishing the configuration for the images scraper')
+
+        backup_album_config = images_configs[0].chapter.album
+        get_chapter_index = backup_album_config.get_chapter_index
+        get_chapter_name = backup_album_config.get_chapter_name
+        get_link_from_tag = backup_album_config.get_link_from_tag
+        get_source_from_tag = backup_album_config.get_source_from_tag
+
         if images_configs and len(images_configs) > 1:
             # Deletes local attributes so that it can be pickled (multiprocessing requirement)
             dummy_album_config = images_configs[0].chapter.album
@@ -133,6 +140,11 @@ class Album():
         with Pool(processes=self.config.max_image_processes) as executor:
             executor.map(self.image_scraper.scrape, images_configs)
         logging.info('Images scraped successfully!!')
+
+        backup_album_config.get_chapter_index = get_chapter_index
+        backup_album_config.get_chapter_name = get_chapter_name
+        backup_album_config.get_link_from_tag = get_link_from_tag
+        backup_album_config.get_source_from_tag = get_source_from_tag
 
     def scrape_images_from_chapter_links(
         self,

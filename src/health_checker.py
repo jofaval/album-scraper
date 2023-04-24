@@ -109,9 +109,20 @@ class HealthChecker():
     def check(self) -> bool:
         """Checks the health of the given album"""
         chapters_configs = self.get_chapters_configs()
-        unhealthy_chapters: List[ChapterConfig] = []
 
-        for chapter_config in chapters_configs:
+        unhealthy_chapters: List[ChapterConfig] = []
+        missing_chapters: List[int] = []
+
+        for index, chapter_config in enumerate(chapters_configs):
+            chapter_basename: str = os.path.basename(
+                chapter_config.chapter_path
+            )
+            chapter_index = int(chapter_basename.split(
+                "-")[0]) + self.config.starting_health_check_image_index
+
+            if len(missing_chapters) + index != chapter_index:
+                missing_chapters.append(len(missing_chapters) + index)
+
             is_chapter_healthy = self.check_health_of_chapter(chapter_config)
             if not is_chapter_healthy:
                 unhealthy_chapters.append(chapter_config)
@@ -123,7 +134,21 @@ class HealthChecker():
         if unhealthy_chapters:
             # TODO: use info logging
             logging.warning(
-                '\n'.join((c.chapter_path for c in unhealthy_chapters))
+                '\n'.join(
+                    (chapter_config.chapter_path for chapter_config in unhealthy_chapters)
+                )
+            )
+            return False
+
+        logging.warning(
+            "%d missing chapter(s) were detected",
+            len(missing_chapters)
+        )
+        if missing_chapters:
+            # TODO: use info logging
+            logging.warning(
+                '\n'.join((str(chapter_index)
+                          for chapter_index in missing_chapters))
             )
 
         return not unhealthy_chapters

@@ -39,7 +39,13 @@ class AlbumChaptersScraper(Scraper):
 
         return chapter_links
 
-    def scrape(self, page_start=0, page_end=1_000_000_000) -> Union[List[str], None]:
+    def scrape(
+        self,
+        # initial page index
+        page_start=0,
+        # last page index
+        page_end=1_000_000_000
+    ) -> Union[List[str], None]:
         """Scrapers all the chapter links from the starting page"""
         starting_page_content = self.scrape_url(
             self.config.starting_url,
