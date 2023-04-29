@@ -1,3 +1,5 @@
+import { LoggingLevel } from "./logging.type";
+
 /** All the necessary configuration for an album */
 export type AlbumConfiguration = {
   // album
@@ -18,7 +20,7 @@ export type AlbumConfiguration = {
   /** Does it show first the latest chapters? If so, it's in reverse order */
   isReverseOrder: boolean;
   /** Desired logging level */
-  loggingLevel: number;
+  loggingLevel: LoggingLevel;
   /** Wether it will attempt to scrape or not */
   shouldScrape: boolean;
   /** Filepath slug for the album */
