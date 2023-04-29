@@ -11,6 +11,8 @@
     "baseUrl": "./",
     "paths": {
       "~/*": ["./src/*"]
-    }
+    },
+    "noUncheckedIndexedAccess": true,
+    "strict": true
   }
 }
