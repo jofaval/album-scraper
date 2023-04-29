@@ -1,11 +1,11 @@
 """Album Chapters Scraper"""
 
-import logging
 from typing import List, Union
 
 from bs4 import BeautifulSoup
 
 from src.album_config import AlbumConfig
+from src.logger import get_logger
 from src.scraper import Scraper
 
 
@@ -20,7 +20,7 @@ class AlbumChaptersScraper(Scraper):
         """Get chapter links from the page content"""
         chapter_links_tags = content.select(self.config.chapter_link_query)
         if not chapter_links_tags:
-            logging.warning("No chapter links were found... sorry")
+            get_logger().warning("No chapter links were found... sorry")
             return None
 
         chapter_links = []
@@ -53,7 +53,7 @@ class AlbumChaptersScraper(Scraper):
             self.config.max_retry_attempts_per_chapter
         )
         if not starting_page_content:
-            logging.warning(
+            get_logger().warning(
                 "No content was found for chapter links to be retrieved from"
             )
             return None

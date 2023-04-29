@@ -1,6 +1,6 @@
 """Album"""
 
-import logging
+
 import os
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Pool
@@ -15,6 +15,7 @@ from src.chapter_scraper import ChapterScraper
 from src.health_checker import HealthChecker
 from src.image_config import ImageConfig
 from src.image_scraper import ImageScraper
+from src.logger import get_logger
 
 
 class Album():
@@ -28,10 +29,7 @@ class Album():
     def __init__(self, config: AlbumConfig) -> None:
         assert config.chapter_end > config.chapter_start
 
-        logging.getLogger("album").setLevel(config.logging_level)
-        logging.getLogger("webscrapper").setLevel(config.logging_level)
-
-        logging.info("Initializing web scraper...")
+        get_logger().info("Initializing web scraper...")
 
         self.config = config
 
@@ -54,7 +52,7 @@ class Album():
         """Gets the links from all the chapters"""
         chapters_links = self.album_chapters_scraper.scrape()
         if not chapters_links:
-            logging.warning("No chapters were found, can't reverse it")
+            get_logger().warning("No chapters were found, can't reverse it")
             return None
 
         chapters_links = list(set(chapters_links))
@@ -74,7 +72,7 @@ class Album():
         chapters_links: List[str],
     ) -> Generator[ChapterConfig, None, None]:
         """Generates the configuration for all the given chapters"""
-        logging.info("Generating configuration for the chapters scraping...")
+        get_logger().info("Generating configuration for the chapters scraping...")
         chapter_configs = (
             ChapterConfig(
                 url=chapter_link,
@@ -87,7 +85,7 @@ class Album():
             )
             for index, chapter_link in enumerate(chapters_links)
         )
-        logging.info("Configuration for the chapters scraping generated!!")
+        get_logger().info("Configuration for the chapters scraping generated!!")
 
         return chapter_configs
 
@@ -95,15 +93,15 @@ class Album():
         """Closure function to scrape images links and append them"""
         chapter_config, images_configs = data
         name, url = attrgetter("name", "url")(chapter_config)
-        logging.info('Scraping chapter "%s" (%s)', name, url)
+        get_logger().info('Scraping chapter "%s" (%s)', name, url)
 
         inner_images_configs = self.chapter_scraper.scrape(chapter_config)
         if not inner_images_configs:
-            logging.info('Could not scrape chapter "%s" (%s)', name, url)
+            get_logger().info('Could not scrape chapter "%s" (%s)', name, url)
             return None
 
         images_configs.extend(inner_images_configs)
-        logging.info('Chapter "%s" (%s) scraped successfully', name, url)
+        get_logger().info('Chapter "%s" (%s) scraped successfully', name, url)
         return None
 
     def scrape_chapters(self) -> Union[List[str], None]:
@@ -111,14 +109,14 @@ class Album():
         if self.chapters_links:
             return self.chapters_links
 
-        logging.info("Starts scraping chapters, looking for links...")
+        get_logger().info("Starts scraping chapters, looking for links...")
 
         chapters_links = self.get_chapters_links()
-        logging.info("Chapters links retrieved!")
+        get_logger().info("Chapters links retrieved!")
         if not chapters_links:
-            logging.warning("No chapters were found, it won't try to scrape")
+            get_logger().warning("No chapters were found, it won't try to scrape")
             return None
-        logging.info("Chapters links were successfully retrieved")
+        get_logger().info("Chapters links were successfully retrieved")
 
         chapters_links = chapters_links[self.config.chapter_start:self.config.chapter_end]
         self.chapters_links = chapters_links
@@ -126,7 +124,7 @@ class Album():
 
     def download_images(self, images_configs: List[ImageConfig]) -> None:
         """Downloads the scraped images"""
-        logging.info('Polishing the configuration for the images scraper')
+        get_logger().info('Polishing the configuration for the images scraper')
 
         backup_album_config = images_configs[0].chapter.album
         get_chapter_index = backup_album_config.get_chapter_index
@@ -142,10 +140,10 @@ class Album():
             del dummy_album_config.get_link_from_tag
             del dummy_album_config.get_source_from_tag
 
-        logging.info('Starting images scraper')
+        get_logger().info('Starting images scraper')
         with Pool(processes=self.config.max_image_processes) as executor:
             executor.map(self.image_scraper.scrape, images_configs)
-        logging.info('Images scraped successfully!!')
+        get_logger().info('Images scraped successfully!!')
 
         backup_album_config.get_chapter_index = get_chapter_index
         backup_album_config.get_chapter_name = get_chapter_name
@@ -159,7 +157,7 @@ class Album():
         """Scrapes all the images links from every chapter"""
         images_configs: List[ImageConfig] = []
 
-        logging.info("Starting to scrape the chapters, looking for images...")
+        get_logger().info("Starting to scrape the chapters, looking for images...")
         # TODO: convert to pool using a common file to write to? can't pickle local objects
         with ThreadPoolExecutor(max_workers=self.config.max_chapter_workers) as executor:
             executor.map(self.scrape_chapter_images_thread, (
@@ -169,9 +167,9 @@ class Album():
             executor.shutdown(wait=True)
 
         if not images_configs:
-            logging.warning("No images could be retrieved or configured")
+            get_logger().warning("No images could be retrieved or configured")
             return None
-        logging.info('Chapters scraped successfully')
+        get_logger().info('Chapters scraped successfully')
 
         return images_configs
 
@@ -188,7 +186,7 @@ class Album():
         if not chapters_links:
             chapters_links = self.scrape_chapters()
             if not chapters_links:
-                logging.warning("No chapter links were retrieved, stopping...")
+                get_logger().warning("No chapter links were retrieved, stopping...")
                 return
 
         if self.config.chapter_indices:
@@ -196,7 +194,7 @@ class Album():
                 chapters_links[index]
                 for index in self.config.chapter_indices
             ]
-        logging.warning("%d chapter(s) was/were detected", len(chapters_links))
+        get_logger().warning("%d chapter(s) was/were detected", len(chapters_links))
 
         chapters_configs = self.generate_chapters_configs(chapters_links)
 
@@ -204,29 +202,29 @@ class Album():
             chapters_configs
         )
         if not images_configs:
-            logging.warning("No images could be configured, stopping...")
+            get_logger().warning("No images could be configured, stopping...")
             return
-        logging.warning("%d image(s) was/were detected", len(images_configs))
+        get_logger().warning("%d image(s) was/were detected", len(images_configs))
 
         self.download_images(images_configs)
 
-        logging.info('\nEverything went smoothly\n')
+        get_logger().info('\nEverything went smoothly\n')
 
     def check_health(self) -> None:
         """Checks the album's health"""
-        logging.warning("Checking chapter health...")
+        get_logger().warning("Checking chapter health...")
 
         health_checker = HealthChecker(self.config)
         is_healthy = health_checker.is_album_healthy()
 
         if is_healthy:
-            logging.warning("Album is healthy")
+            get_logger().warning("Album is healthy")
         else:
-            logging.warning("Album is NOT healthy")
+            get_logger().warning("Album is NOT healthy")
 
     def download_updates(self, updates: List[str]) -> None:
         """Downloads the given updates, overriding locally if necessary"""
-        logging.warning("Downloading updates...")
+        get_logger().warning("Downloading updates...")
         return self.scrape(chapters_links=updates)
 
     def detect_updates(self) -> None:
@@ -247,16 +245,16 @@ class Album():
                 updates.append(chapter_link)
 
         if not updates:
-            logging.warning("No updates were found")
+            get_logger().warning("No updates were found")
             return
 
         total_updates = len(updates)
-        logging.warning(
+        get_logger().warning(
             "%d chapter updates were detected"
             if total_updates != 1 else "%d chapter update was detected",
             total_updates
         )
-        logging.warning('\n'.join(updates))
+        get_logger().warning('\n'.join(updates))
 
         if self.config.should_download_updates:
             self.download_updates(updates)

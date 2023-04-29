@@ -1,6 +1,5 @@
 """Request Utils"""
 
-import logging
 
 import cchardet
 from requests import get
@@ -47,7 +46,7 @@ def get_url_content(
 
     while True:
         if retry_attempt >= 1:
-            logging.warning(
+            get_logger().warning(
                 "Retrying %s for the %d failed attempt(s)", url, retry_attempt
             )
 
@@ -64,7 +63,7 @@ def get_url_content(
 
             return response.content
         except Exception as error:
-            logging.exception(error)
+            get_logger().exception(error)
         finally:
             retry_attempt += 1
             if retry_attempt >= max_retry:

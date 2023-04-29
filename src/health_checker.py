@@ -1,6 +1,5 @@
 """Health checker"""
 
-import logging
 import os
 from os import listdir
 from os.path import isfile, join
@@ -8,11 +7,12 @@ from typing import Any, Generator, List
 
 from src.album_config import AlbumConfig
 from src.chapter_config import ChapterConfig
+from src.logger import get_logger
 
 
 def log_health_details_list(label: str, details: List[Any]) -> None:
     """Custom logging formatter for the Health checker"""
-    logging.info(
+    get_logger().info(
         "%s:\n%s",
         label,
         '\n'.join((str(detail) for detail in details))
@@ -74,19 +74,19 @@ class HealthChecker():
         # TODO: print anywhere else the number of missing images, or store it
         corrupt_number_series = self.get_missing_images(images)
         if corrupt_number_series:
-            logging.warning(
+            get_logger().warning(
                 "Chapter \"%s\" has an incomplete number of images, %d missing images",
                 chapter_config.chapter_path,
                 len(corrupt_number_series)
             )
             # TODO: use info logging
-            logging.warning(corrupt_number_series)
+            get_logger().warning(corrupt_number_series)
             log_health_details_list("Missing images", corrupt_number_series)
 
         # TODO: print anywhere else the number of corrupt images, or store it
         corrupt_images = self.get_corrupt_image_sizes(images)
         if corrupt_images:
-            logging.warning(
+            get_logger().warning(
                 "Chapter \"%s\" has %d corrupt images",
                 chapter_config.chapter_path,
                 len(corrupt_images)
@@ -96,7 +96,7 @@ class HealthChecker():
         is_healthy = not corrupt_number_series and not corrupt_images
 
         if not is_healthy:
-            logging.warning("\n")
+            get_logger().warning("\n")
 
         return is_healthy
 
@@ -149,7 +149,7 @@ class HealthChecker():
             if not self.is_chapter_healthy(chapter_config)
         ]
 
-        logging.warning(
+        get_logger().warning(
             "%d unhealthy chapter(s) were detected",
             len(unhealthy_chapters)
         )
@@ -165,7 +165,7 @@ class HealthChecker():
         """Check if there are any missing chapters"""
         missing_chapters = self.get_missing_chapters()
 
-        logging.warning(
+        get_logger().warning(
             "%d missing chapter(s) were detected",
             len(missing_chapters)
         )

@@ -1,6 +1,5 @@
 """Image Scraper"""
 
-import logging
 import os
 import shutil
 # from multiprocessing import Pool
@@ -10,6 +9,7 @@ import cchardet
 from requests import Response, get
 
 from src.image_config import ImageConfig
+from src.logger import get_logger
 
 
 class ImageScraper():
@@ -22,7 +22,7 @@ class ImageScraper():
             try:
                 os.makedirs(image_path_dir)
             except FileExistsError:
-                logging.warning("Attempted to recreate dir %s", image_path_dir)
+                get_logger().warning("Attempted to recreate dir %s", image_path_dir)
 
         try:
             if os.path.exists(image_path):
@@ -31,7 +31,7 @@ class ImageScraper():
             with open(image_path, 'wb') as writer:
                 shutil.copyfileobj(content, writer)
         except Exception as error:
-            logging.exception(
+            get_logger().exception(
                 "Could not save image %s, error: %s",
                 image_path,
                 error
@@ -64,14 +64,14 @@ class ImageScraper():
         retry_attempt = 0
 
         while True:
-            logging.info("Attempting image download for %s", config.url)
+            get_logger().info("Attempting image download for %s", config.url)
             if retry_attempt > 0:
-                logging.info("Attempt number %d", retry_attempt)
+                get_logger().info("Attempt number %d", retry_attempt)
 
             try:
                 response = get(config.url, stream=True, timeout=30)
                 if not response.ok:
-                    logging.warning(
+                    get_logger().warning(
                         "%s failed download, might retry",
                         config.url
                     )
@@ -88,7 +88,7 @@ class ImageScraper():
 
                 return response
             except Exception as error:
-                logging.exception(error)
+                get_logger().exception(error)
             finally:
                 retry_attempt += 1
                 if retry_attempt >= max_retry:
@@ -96,10 +96,10 @@ class ImageScraper():
 
     def scrape(self, config: ImageConfig) -> None:
         """Scrapes an image and writes it with metadata"""
-        logging.warning("Start scraper for image: %s", config.url)
+        get_logger().warning("Start scraper for image: %s", config.url)
         response = self.get_image_content(config)
         if not response or not response.ok:
-            logging.warning("%s could not be downloaded", config.url)
+            get_logger().warning("%s could not be downloaded", config.url)
             return None
 
         image_path = self.get_image_path(
@@ -110,16 +110,16 @@ class ImageScraper():
             img_format=response.headers.get("Content-Type")
         )
 
-        logging.info("Attempting to save image %s %s", image_path, config.url)
+        get_logger().info("Attempting to save image %s %s", image_path, config.url)
         try:
             # TODO: implement base path
             self.save(response.raw, image_path)
             # TODO: implement proper threading with file as tuple space
         except Exception as error:
-            logging.exception(
+            get_logger().exception(
                 "Image could not be saved %s %s, %s", image_path, config.url, error
             )
             return None
 
-        logging.warning("Image saved %s %s!!", image_path, config.url)
+        get_logger().warning("Image saved %s %s!!", image_path, config.url)
         return None

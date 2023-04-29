@@ -27,7 +27,7 @@ class AlbumConfig(BaseModel):
     """Extracts the link from the chapter tag"""
     is_reverse_order: bool = True
     """Does it show first the latest chapters? If so, it's in reverse order"""
-    logging_level: int = logging.NOTSET
+    logging_level: int = logging.DEBUG
     """Desired logging level"""
     should_scrape: bool = True
     """Wether it will attempt to scrape or not"""

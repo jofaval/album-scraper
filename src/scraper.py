@@ -1,6 +1,5 @@
 """Scraper"""
 
-import logging
 # from multiprocessing import Pool
 from typing import Union
 
@@ -30,7 +29,7 @@ class Scraper():
             retry_times=retry_times
         )
         if not content:
-            logging.warning("No content was retrieved from: %s", url)
+            get_logger().warning("No content was retrieved from: %s", url)
             return None
 
         return self.parse_content(content)
