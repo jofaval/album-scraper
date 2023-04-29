@@ -4,6 +4,13 @@ The log of changes on the project/repository.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 2023-04-29
+
+### Added
+
+- C# base structure, not tested, nor executed, nor compiled...
+- Finally uploaded the _custom_ logger
+
 ## 2023-04-24
 
 ### Added
