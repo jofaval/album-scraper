@@ -3,65 +3,110 @@ using System.Collections.Generic;
 
 public class Album
 {
-    private AlbumConfig albumConfig;
-    private List<string> chapterLinks;
+    private AlbumConfiguration albumConfiguration;
+    private List<string> chapterLinks = new List<string>();
 
-    public Album(AlbumConfig albumConfig)
+    public Album(AlbumConfiguration albumConfiguration)
     {
-        this.albumConfig = albumConfig;
+        this.albumConfiguration = albumConfiguration;
     }
 
-    public List<string> scrapeChapterLinks()
+    private List<string> scrapeChapterLinks(bool force)
     {
-        if (this.chapterLinks)
+        if (!force && this.chapterLinks.Count > 0)
         {
             return this.chapterLinks;
         }
 
-        List<string> chapterLinks;
-        throw NotImplementedException("scrapeChapterLinks not implemented");
+        chapterLinks = new List<string>();
+        string content = Scraper.scrape(url: albumConfiguration.baseUrl);
+
+        var chapterLinkNodes = content.QuerySelectorAll(albumConfiguration.chapterLinksQuery);
+        if (chapterLinkNodes == null)
+        {
+            throw new Exception(message: "No chapter links were found!!");
+        }
+
+        foreach (HtmlNode chapterLinkNode in chapterLinkNodes)
+        {
+            chapterLinks.Add(item: chapterLinkNode.GetAttributeValue("href", null));
+        }
+
         return chapterLinks;
     }
 
-    public List<string> scrapeChapterImageLinks()
+    private List<string> scrapeChapterImageLinks(ChapterConfiguration chapterConfiguration)
     {
-
+        throw new NotImplementedException(message: "scrapeChapterImageLinks not implemented");
     }
 
-    public List<ChapterConfiguration> generateChapterConfigsFromChapterLinks()
+    private void scrapeChapterImages(List<ImageConfiguration> imageConfigurations)
     {
-
-    }
-
-    public void scrape()
-    {
-        List<ChapterConfiguration> chapterConfigurations = this.generateChapterConfigsFromChapterLinks(this.scrapeChapterLinks());
-
-        // TODO: extract into another method?
-        foreach (string chapterLink in chapterLinks)
+        foreach (ImageConfiguration imageConfiguration in imageConfigurations)
         {
-            this.scrapeChapterImageLinks();
+            ChapterImageScraper.scrapeImage(imageConfiguration);
+        }
+    }
+
+    private List<ImageConfiguration> generateImageConfigurations(List<ChapterConfiguration> chapterConfigurations)
+    {
+        List<ImageConfiguration> imageConfigurations = new List<ImageConfiguration>();
+        for (int index = 0; index < chapterConfigurations.Count; index++)
+        {
+            generateImageConfigurationsFromChapter(imageConfigurations, index, chapterConfiguration: chapterConfigurations[index]);
         }
 
-        throw NotImplementedException("scrape not implemented");
+        return imageConfigurations;
+    }
 
+    private void generateImageConfigurationsFromChapter(List<ImageConfiguration> imageConfigurations, int index, ChapterConfiguration chapterConfiguration)
+    {
+        List<string> imageLinks = scrapeChapterImageLinks(chapterConfiguration);
+        for (int imageIndex = 0; imageIndex < imageLinks.Count; imageIndex++)
+        {
+            string imageLink = imageLinks[index: imageIndex];
+            imageConfigurations.Add(item: new ImageConfiguration(chapterConfiguration, url: imageLink, index));
+        }
+    }
+
+    private List<ChapterConfiguration> generateChapterConfigurations(List<string> chapterLinks)
+    {
+        List<ChapterConfiguration> chapterConfigurations = new List<ChapterConfiguration>();
+
+        for (int chapterLinkIndex = 0; chapterLinkIndex < chapterLinks.Count; chapterLinkIndex++)
+        {
+            string chapterLink = chapterLinks[index: chapterLinkIndex];
+            chapterConfigurations.Add(item: new ChapterConfiguration(albumConfiguration, url: chapterLink, index));
+        }
+
+        return chapterConfigurations;
+    }
+
+    public void scrape(bool forceScrape = false)
+    {
+        List<string> chapterLinks = scrapeChapterLinks(force: forceScrape);
+        List<ChapterConfiguration> chapterConfigurations = generateChapterConfigurations(chapterLinks);
+        List<ImageConfiguration> imageConfigurations = generateImageConfigurations(chapterConfigurations);
+        // TODO: filter repeated URLs?! maybe not, but cache the image URL download?
+
+        scrapeChapterImages(imageConfigurations);
     }
 
     public void getUpdates()
     {
-        throw NotImplementedException("getUpdates not implemented");
+        throw new NotImplementedException(message: "getUpdates not implemented");
     }
 
     public void saveUpdates()
     {
-        throw NotImplementedException("saveUpdates not implemented");
+        throw new NotImplementedException(message: "saveUpdates not implemented");
     }
 
     public bool isHealthy()
     {
         bool isHealthy = true;
 
-        throw NotImplementedException("isHealthy not implemented");
+        throw new NotImplementedException(message: "isHealthy not implemented");
 
         return isHealthy;
     }

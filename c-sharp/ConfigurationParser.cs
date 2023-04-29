@@ -6,23 +6,23 @@ public class ConfigurationParser<ConfigurationType>
 {
     private static ConfigurationType parseXml(string content)
     {
-        throw NotImplementedException("parseXml not implemented");
+        throw new NotImplementedException(message: "parseXml not implemented");
     }
 
     private static ConfigurationType parseYaml(string content)
     {
-        throw NotImplementedException("parseYaml not implemented");
+        throw new NotImplementedException(message: "parseYaml not implemented");
     }
 
     private static ConfigurationType parseJson(string content)
     {
-        throw NotImplementedException("parseJson not implemented");
+        throw new NotImplementedException(message: "parseJson not implemented");
     }
 
     private static string readFileContents(string filename)
     {
         string content = "";
-        throw NotImplementedException("readFileContents");
+        throw new NotImplementedException(message: "readFileContents");
         return content;
     }
 
@@ -47,7 +47,7 @@ public class ConfigurationParser<ConfigurationType>
 
         if (!parser)
         {
-            throw Exception($"Extension \"{extension}\" is not valid for a configuration");
+            throw new Exception($"Extension \"{extension}\" is not valid for a configuration");
         }
 
         return parser;
@@ -57,7 +57,7 @@ public class ConfigurationParser<ConfigurationType>
     {
         if (!System.IO.Path.Exists(path: filename))
         {
-            throw FileNotFoundException($"{filename} was not found");
+            throw new FileNotFoundException($"{filename} was not found");
         }
 
         string extension = getFileExtension(filename);

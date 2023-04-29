@@ -3,18 +3,14 @@ using Album;
 
 public class Orchestrator
 {
-    private AlbumConfig albumConfig;
+    private AlbumConfiguration albumConfiguration;
     private Album album;
 
-    public Orchestrator(AlbumConfig albumConfig)
+    public void prepare(string configurationPath)
     {
-        this.albumConfig = albumConfig;
-    }
-
-    public void prepare()
-    {
-        this.album = new Album(albumConfig);
-
+        albumConfiguration = new AlbumConfiguration();
+        // TODO: parse
+        album = new Album(albumConfiguration);
     }
 
     public void scrapeChapters()
@@ -43,30 +39,29 @@ public class Orchestrator
     }
 
     public void start(
+        string configurationPath = "", // not implemented
         bool shouldScrapeChapters = true,
         bool shouldCheckHealth = false, // not implemented
         bool shouldDetectUpdates = false, // not implemented
         bool shouldDownloadUpdates = false // not implemented
     )
     {
-        this.prepare();
+        this.prepare(configurationPath);
 
         if (shouldDownloadUpdates && !shouldDetectUpdates)
         {
-            System.Console.WriteLine("No updates will be downloaded if they're not detected first");
-
+            throw new Exception(message: "No updates will be downloaded if they're not detected first... please,"
+            + "enable the updates detection, or disable the updates downloads");
         }
 
         if (shouldScrapeChapters)
         {
             this.scrapeChapters();
-
         }
 
         if (shouldDetectUpdates)
         {
             this.detectUpdates(shouldDownloadUpdates);
-
         }
 
         if (shouldCheckHealth)
