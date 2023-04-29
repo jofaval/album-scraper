@@ -57,31 +57,27 @@ const renderOption = (option: TOptionTag) => (
 );
 
 export default function Home() {
+  /* TODO: tab between progress bar and the actual form, some sort of logger? maybe inside the progress section */
+
   return (
-    <main class="text-center mx-auto text-gray-700 p-4 container">
-      <h1 class="max-6-xs text-6xl text-sky-700 font-thin uppercase my-16">
-        Album scraper
-      </h1>
+    <form class="form">
+      <fieldset class="first__row">
+        <div class="input__container">
+          <label for="websiteUrl">Website URL: </label>
+          <input type="text" name="" id="websiteUrl" />
+        </div>
 
-      <form class="form">
-        <fieldset class="first__row">
-          <div class="input__container">
-            <label for="websiteUrl">Website URL: </label>
-            <input type="text" name="" id="websiteUrl" />
-          </div>
+        <div class="input__container">
+          <label for="websiteUrl">Preset: </label>
+          <input type="text" name="" id="websiteUrl" />
+        </div>
+      </fieldset>
 
-          <div class="input__container">
-            <label for="websiteUrl">Preset: </label>
-            <input type="text" name="" id="websiteUrl" />
-          </div>
-        </fieldset>
+      <Accordion class="space-y-2 mt-5" defaultValue={""} toggleable>
+        <For each={OptionTags}>{renderOption}</For>
+      </Accordion>
 
-        <Accordion class="space-y-2 mt-5" defaultValue={""} toggleable>
-          <For each={OptionTags}>{renderOption}</For>
-        </Accordion>
-
-        <input type="submit" class="" value={"Scrape"} />
-      </form>
-    </main>
+      <input type="submit" class="" value={"Scrape"} />
+    </form>
   );
 }

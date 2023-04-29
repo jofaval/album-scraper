@@ -2,10 +2,11 @@ import { A } from "solid-start";
 
 export default function NotFound() {
   return (
-    <main class="text-center mx-auto text-gray-700 p-4">
-      <h1 class="max-6-xs text-6xl text-sky-700 font-thin uppercase my-16">
+    <>
+      <h2 class="max-6-xs text-4xl text-sky-700 font-thin uppercase">
         Not Found
-      </h1>
+      </h2>
+
       <p class="mt-8">
         Visit{" "}
         <a
@@ -26,6 +27,6 @@ export default function NotFound() {
           About Page
         </A>
       </p>
-    </main>
+    </>
   );
 }
