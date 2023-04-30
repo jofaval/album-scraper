@@ -4,7 +4,7 @@ using Fizzler;
 
 public class Scraper
 {
-    private static (bool, TReturnType) withRetries<TReturnType>(Func<(bool, TReturnType)> execute, int retries = 3)
+    private static (bool, TReturnType) WithRetries<TReturnType>(Func<(bool, TReturnType)> execute, int retries)
     {
         int retryAttempt = 0;
 
@@ -32,9 +32,9 @@ public class Scraper
     }
 
     // TODO: properly type and download the Fizzler
-    public static HtmlDocument scrape(string url, int retries)
+    public static HtmlDocument Scrape(string url, int retries)
     {
-        (bool, string) success, content = withRetries<HtmlDocument>(execute: () =>
+        (bool, string) success, content = WithRetries<HtmlDocument>(execute: () =>
         {
             string content = await new HttpClient().GetStringAsync(url);
             if (!content)

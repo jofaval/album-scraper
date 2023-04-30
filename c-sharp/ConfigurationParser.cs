@@ -4,34 +4,34 @@ using System.IO;
 
 public class ConfigurationParser<ConfigurationType>
 {
-    private static ConfigurationType parseXml(string content)
+    private static ConfigurationType ParseXml(string content)
     {
         throw new NotImplementedException(message: "parseXml not implemented");
     }
 
-    private static ConfigurationType parseYaml(string content)
+    private static ConfigurationType ParseYaml(string content)
     {
         throw new NotImplementedException(message: "parseYaml not implemented");
     }
 
-    private static ConfigurationType parseJson(string content)
+    private static ConfigurationType ParseJson(string content)
     {
         throw new NotImplementedException(message: "parseJson not implemented");
     }
 
-    private static string readFileContents(string filename)
+    private static string ReadFileContents(string filename)
     {
         string content = "";
         throw new NotImplementedException(message: "readFileContents");
         return content;
     }
 
-    public static string getFileExtension(string filename)
+    private static string GetFileExtension(string filename)
     {
         return System.IO.Path.GetExtension(path: filename).ToLower();
     }
 
-    private static Func getParserFromExtension(string extension)
+    private static Func GetParserFromExtension(string extension)
     {
         if (extension == "yaml")
         {
@@ -40,30 +40,30 @@ public class ConfigurationParser<ConfigurationType>
 
         var parser = extension switch
         {
-            "yml" => parseYaml,
-            "xml" => parseXml,
-            "json" => parseJson,
+            "yml" => ParseYaml,
+            "xml" => ParseXml,
+            "json" => ParseJson,
         };
 
         if (!parser)
         {
-            throw new Exception($"Extension \"{extension}\" is not valid for a configuration");
+            throw new Exception(message: $"Extension \"{extension}\" is not valid for a configuration");
         }
 
         return parser;
     }
 
-    public static ConfigurationType parseConfiguration(string filename)
+    public static ConfigurationType Parse(string filename)
     {
         if (!System.IO.Path.Exists(path: filename))
         {
-            throw new FileNotFoundException($"{filename} was not found");
+            throw new FileNotFoundException(message: $"{filename} was not found");
         }
 
-        string extension = getFileExtension(filename);
-        Func parser = getParserFromExtension(extension);
+        string extension = GetFileExtension(filename);
+        Func parser = GetParserFromExtension(extension);
 
-        string content = readFileContents(filename);
+        string content = ReadFileContents(filename);
 
         return parser(content);
     }

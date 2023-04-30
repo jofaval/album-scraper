@@ -5,21 +5,21 @@ public class Orchestrator
     private AlbumConfiguration albumConfiguration;
     private Album album;
 
-    public void prepare(string configurationPath)
+    private void Prepare(string configurationPath)
     {
         albumConfiguration = new AlbumConfiguration();
         // TODO: parse configuration
         album = new Album(albumConfiguration);
     }
 
-    public void scrapeChapters()
+    private void ScrapeChapters()
     {
-        this.album.scrape();
+        this.album.Scrape();
     }
 
-    public void detectUpdates(bool shouldDownloadUpdates)
+    private void DetectUpdates(bool shouldDownloadUpdates)
     {
-        this.album.getUpdates();
+        this.album.GetUpdates();
 
         if (shouldDownloadUpdates)
         {
@@ -27,17 +27,17 @@ public class Orchestrator
         }
     }
 
-    public void downloadUpdates()
+    private void DownloadUpdates()
     {
-        this.album.saveUpdates();
+        this.album.SaveUpdates();
     }
 
-    public bool checkHealth()
+    private bool CheckHealth()
     {
-        bool isHealthy = this.album.isHealthy();
+        bool isHealthy = this.album.IsHealthy();
     }
 
-    public void start(
+    public void Start(
         string configurationPath = "", // not implemented
         bool shouldScrapeChapters = true,
         bool shouldCheckHealth = false, // not implemented
@@ -45,7 +45,7 @@ public class Orchestrator
         bool shouldDownloadUpdates = false // not implemented
     )
     {
-        this.prepare(configurationPath);
+        this.Prepare(configurationPath);
 
         if (shouldDownloadUpdates && !shouldDetectUpdates)
         {
@@ -55,17 +55,17 @@ public class Orchestrator
 
         if (shouldScrapeChapters)
         {
-            this.scrapeChapters();
+            this.ScrapeChapters();
         }
 
         if (shouldDetectUpdates)
         {
-            this.detectUpdates(shouldDownloadUpdates);
+            this.DetectUpdates(shouldDownloadUpdates);
         }
 
         if (shouldCheckHealth)
         {
-            this.checkHealth();
+            this.CheckHealth();
         }
     }
 }

@@ -22,7 +22,7 @@ public class ChapterConfiguration : IComparable<ChapterConfiguration>
         return obj is ChapterConfiguration configuration && url == configuration.url;
     }
 
-    public string getChapterPath()
+    public string GetChapterPath()
     {
         if (!this.path)
         {

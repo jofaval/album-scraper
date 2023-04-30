@@ -2,7 +2,7 @@ using System;
 
 public class ChapterImageScraper
 {
-    public static void scrapeImage(ImageConfiguration imageConfiguration)
+    public static void ScrapeImage(ImageConfiguration imageConfiguration)
     {
         throw new NotImplementedException(message: "scrapeImage not implemented");
     }

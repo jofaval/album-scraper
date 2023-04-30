@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Finished base configuration for c#
 
+### Modified
+
+- Use proper (Pascal) casing for functions, c#
+
 ## 2023-04-29
 
 ### Added
