@@ -27,7 +27,7 @@ class ChapterConfig(BaseModel):
     chapter_path: str = ""
     """[Internal] chapter's download path, automatically generated"""
 
-    def generate_chapter_path(self) -> None:
+    def generate_chapter_path(self) -> str:
         """Generates the path for the chapter"""
         if not self.chapter_path:
             chapter_index = str(self.index).zfill(self.album.chapter_index_len)

@@ -1,5 +1,4 @@
 using System;
-using Album;
 
 public class Orchestrator
 {
@@ -9,7 +8,7 @@ public class Orchestrator
     public void prepare(string configurationPath)
     {
         albumConfiguration = new AlbumConfiguration();
-        // TODO: parse
+        // TODO: parse configuration
         album = new Album(albumConfiguration);
     }
 

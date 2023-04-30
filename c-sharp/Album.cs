@@ -19,7 +19,7 @@ public class Album
         }
 
         chapterLinks = new List<string>();
-        string content = Scraper.scrape(url: albumConfiguration.baseUrl);
+        string content = Scraper.scrape(url: albumConfiguration.startingUrl);
 
         var chapterLinkNodes = content.QuerySelectorAll(albumConfiguration.chapterLinksQuery);
         if (chapterLinkNodes == null)
@@ -35,9 +35,23 @@ public class Album
         return chapterLinks;
     }
 
-    private List<string> scrapeChapterImageLinks(ChapterConfiguration chapterConfiguration)
+    private List<string> scrapeChapterImageSources(ChapterConfiguration chapterConfiguration)
     {
-        throw new NotImplementedException(message: "scrapeChapterImageLinks not implemented");
+        List<string> chapterImageSources = new List<string>();
+        string content = Scraper.scrape(url: chapterConfiguration.url);
+
+        var chapterImageSources = content.QuerySelectorAll(albumConfiguration.chapterImagesQuery);
+        if (chapterImageSources == null)
+        {
+            throw new Exception(message: "No chapter images were found!!");
+        }
+
+        foreach (HtmlNode chapterImageNode in chapterImageNodes)
+        {
+            chapterImageSources.Add(item: chapterImageNode.GetAttributeValue("src", null));
+        }
+
+        return chapterImageSources;
     }
 
     private void scrapeChapterImages(List<ImageConfiguration> imageConfigurations)
@@ -61,7 +75,7 @@ public class Album
 
     private void generateImageConfigurationsFromChapter(List<ImageConfiguration> imageConfigurations, int index, ChapterConfiguration chapterConfiguration)
     {
-        List<string> imageLinks = scrapeChapterImageLinks(chapterConfiguration);
+        List<string> imageLinks = scrapeChapterImageSources(chapterConfiguration);
         for (int imageIndex = 0; imageIndex < imageLinks.Count; imageIndex++)
         {
             string imageLink = imageLinks[index: imageIndex];
@@ -86,6 +100,7 @@ public class Album
     {
         List<string> chapterLinks = scrapeChapterLinks(force: forceScrape);
         List<ChapterConfiguration> chapterConfigurations = generateChapterConfigurations(chapterLinks);
+        // TODO: reverse order option
         List<ImageConfiguration> imageConfigurations = generateImageConfigurations(chapterConfigurations);
         // TODO: filter repeated URLs?! maybe not, but cache the image URL download?
 
