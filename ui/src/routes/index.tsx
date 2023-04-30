@@ -1,10 +1,8 @@
 // Vendors
-import { For } from "solid-js";
 // Assets
 import { ChevronUpIcon } from "~/assets";
 // Components
 import {
-  Accordion,
   AccordionButton,
   AccordionHeader,
   AccordionItem,
@@ -12,6 +10,7 @@ import {
   HeadlessSelectOptionProperties,
 } from "solid-headless";
 import AdvancedOptions from "~/components/AdvancedOptions";
+import { FormOptions } from "~/components/FormOptions";
 
 type TOptionTag = {
   title: string;
@@ -60,8 +59,12 @@ export default function Home() {
   /* TODO: tab between progress bar and the actual form, some sort of logger? maybe inside the progress section */
 
   return (
-    <form class="form">
-      <fieldset class="first__row">
+    <form class="form" classList={{ "flex flex-col": true }}>
+      <label>
+        TODO: load preset
+        <input type="file" name="" id="" />
+      </label>
+      {/* <fieldset class="first__row">
         <div class="input__container">
           <label for="websiteUrl">Website URL: </label>
           <input type="text" name="" id="websiteUrl" />
@@ -75,9 +78,16 @@ export default function Home() {
 
       <Accordion class="space-y-2 mt-5" defaultValue={""} toggleable>
         <For each={OptionTags}>{renderOption}</For>
-      </Accordion>
+      </Accordion> */}
 
-      <input type="submit" class="" value={"Scrape"} />
+      <FormOptions slug="required" />
+      <FormOptions slug="advanced" />
+
+      <input
+        type="submit"
+        class="rounded bg-cyan-300 px-3 py-2 uppercase font-bold shadow-xl hover:shadow-md cursor-pointer"
+        value={"Scrape"}
+      />
     </form>
   );
 }
