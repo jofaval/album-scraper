@@ -4,6 +4,16 @@ The log of changes on the project/repository.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 2023-07-03
+
+### Added
+
+- Reorder hotfixer (for incorrect index retrieval at download)
+
+### Fixed
+
+- Custom logger not properly configured
+
 ## 2023-04-30
 
 ### Added

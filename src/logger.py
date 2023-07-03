@@ -2,7 +2,7 @@
 import logging
 
 # pseudo-singleton experience/instance
-static_logger: logging.Logger
+static_logger: logging.Logger = None
 
 
 def get_logger(level: int = logging.NOTSET) -> logging.Logger:
